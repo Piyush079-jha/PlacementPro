@@ -1,0 +1,215 @@
+@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-bg: #080c1a;
+    --color-surface: #0d1225;
+    --color-border: rgba(79, 110, 247, 0.15);
+    --color-primary: #4f6ef7;
+    --color-accent: #f07d1a;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+  background-color: #080c1a;
+    @apply bg-dark-900 text-white antialiased;
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background-image: 
+      radial-gradient(at 20% 10%, rgba(79, 110, 247, 0.08) 0%, transparent 50%),
+      radial-gradient(at 80% 90%, rgba(240, 125, 26, 0.05) 0%, transparent 50%);
+    min-height: 100vh;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Clash Display', system-ui, sans-serif;
+    font-weight: 400;
+  }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #0d1225; }
+  ::-webkit-scrollbar-thumb { background: rgba(79,110,247,0.4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(79,110,247,0.7); }
+
+  ::selection { background: rgba(79, 110, 247, 0.3); color: #fff; }
+}
+
+@layer components {
+  .glass {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(79, 110, 247, 0.12);
+  }
+
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(79, 110, 247, 0.2);
+  }
+
+  .btn-primary {
+    @apply relative overflow-hidden bg-primary-500 hover:bg-primary-600 text-white font-semibold px-6 py-2.5 rounded-xl transition-all duration-200;
+    box-shadow: 0 0 20px rgba(79, 110, 247, 0.3);
+  }
+  .btn-primary:hover { box-shadow: 0 0 30px rgba(79, 110, 247, 0.5); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-ghost {
+    @apply border border-white/10 hover:border-primary-500/50 text-gray-300 hover:text-white font-medium px-6 py-2.5 rounded-xl transition-all duration-200;
+  }
+
+  .card {
+    @apply glass rounded-2xl p-6 transition-all duration-300;
+  }
+  .card:hover { border-color: rgba(79, 110, 247, 0.3); box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+
+  .input-field {
+    @apply w-full bg-dark-700/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-500 transition-all duration-200 outline-none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .input-field:focus { @apply border-primary-500/50; box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.1); }
+
+  .label { @apply block text-sm font-medium text-gray-400 mb-2; }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium;
+  }
+
+  .shimmer-bg {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  .score-ring {
+    stroke-dasharray: 220;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dashoffset 1.5s ease;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #6b8afd 0%, #fff 50%, #f59e4a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    padding-bottom: 0.2em;
+    margin-bottom: -0.2em;
+    display: inline-block;
+  }
+
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #8ba4ff 0%, #4f6ef7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(#0d1225, #0d1225) padding-box,
+                linear-gradient(135deg, rgba(79,110,247,0.5), rgba(240,125,26,0.3)) border-box;
+  }
+
+  .glow-text { text-shadow: 0 0 40px rgba(79, 110, 247, 0.5); }
+}
+/* ── Preloader ────────────────────────────────────────── */
+.preloader-root {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #080c1a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.curtain {
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: #0d1327;
+  transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+  z-index: 1;
+}
+.curtain-left  { left: 0;  transform: translateX(0); }
+.curtain-right { right: 0; transform: translateX(0); }
+
+.preloader-exit .curtain-left  { transform: translateX(-100%); }
+.preloader-exit .curtain-right { transform: translateX(100%); }
+
+.preloader-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.preloader-content.fade-up {
+  opacity: 0;
+  transform: translateY(-16px);
+}
+
+.logo-mark {
+  animation: pp-pulse 2s ease-in-out infinite;
+}
+@keyframes pp-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1; }
+  50%       { transform: scale(1.08); opacity: 0.85; }
+}
+
+.brand-text {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+.brand-placement { color: #ffffff; }
+.brand-pro        { color: #4f6ef7; }
+
+.brand-tagline {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  color: #4a5880;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: -4px;
+}
+
+.progress-track {
+  width: 200px;
+  height: 2px;
+  background: #1e2850;
+  border-radius: 2px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f6ef7, #a5b4fc);
+  border-radius: 2px;
+  transition: width 0.1s linear;
+  box-shadow: 0 0 10px #4f6ef780;
+}
+
+.progress-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #4a5880;
+  letter-spacing: 0.05em;
+}
