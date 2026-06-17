@@ -3,18 +3,21 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Users, ThumbsUp, Plus, X, ChevronDown, ChevronUp, Award } from 'lucide-react';
 
+// color coding for verdict badges - green/red/yellow for selected/rejected/pending
 const verdictColors = {
   Selected: 'bg-green-500/10 text-green-400 border-green-500/20',
   Rejected: 'bg-red-500/10 text-red-400 border-red-500/20',
   'On Hold': 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
 };
 
+// single card for one experience, owns its own expand/collapse state
 const ExperienceCard = ({ exp, onUpvote }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false); // each card expands independently
   return (
     <div className="card hover:scale-[1.005] transition-all duration-200">
       <div className="flex items-start justify-between gap-3 mb-3">
         <div className="flex items-center gap-3">
+          {/* fallback to first letter of company name if no logo exists */}
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-700/20 border border-primary-500/20 flex items-center justify-center text-sm font-bold text-primary-300">
             {exp.company?.[0] || 'C'}
           </div>
@@ -23,6 +26,7 @@ const ExperienceCard = ({ exp, onUpvote }) => {
             <p className="text-gray-500 text-xs">{exp.role}</p>
           </div>
         </div>
+        {/* default to green styling if verdict somehow doesn't match the map */}
         <span className={`badge border ${verdictColors[exp.verdict] || verdictColors.Selected}`}>{exp.verdict}</span>
       </div>
 
@@ -35,6 +39,7 @@ const ExperienceCard = ({ exp, onUpvote }) => {
 
       {exp.rounds?.length > 0 && (
         <div className="mb-3">
+          {/* collapsed by default so the list view doesn't get huge */}
           <button onClick={() => setExpanded(!expanded)} className="flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors">
             {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
             {exp.rounds.length} Interview Round{exp.rounds.length > 1 ? 's' : ''}
@@ -45,6 +50,7 @@ const ExperienceCard = ({ exp, onUpvote }) => {
                 <div key={i} className="p-3 bg-white/3 rounded-xl border border-white/5">
                   <div className="flex items-center justify-between mb-1">
                     <p className="text-sm font-medium text-white">{r.name}</p>
+                    {/* red/yellow/green tag based on how hard the round was */}
                     {r.difficulty && <span className={`text-xs px-2 py-0.5 rounded-full ${r.difficulty === 'Hard' ? 'text-red-400 bg-red-500/10' : r.difficulty === 'Medium' ? 'text-yellow-400 bg-yellow-500/10' : 'text-green-400 bg-green-500/10'}`}>{r.difficulty}</span>}
                   </div>
                   <p className="text-xs text-gray-400 leading-relaxed">{r.description}</p>
@@ -78,6 +84,7 @@ export default function Experiences() {
   const [showForm, setShowForm] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [search, setSearch] = useState('');
+  // form state for the share-experience panel, start with one empty round so the form isn't blank
   const [form, setForm] = useState({
     company: '', role: '', type: 'On-Campus', year: new Date().getFullYear(),
     package: '', tips: '', verdict: 'Selected', isAnonymous: false,
@@ -85,6 +92,7 @@ export default function Experiences() {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  // pulls experiences from backend, optionally filtered by company search
   const fetchExperiences = async () => {
     setLoading(true);
     try {
@@ -98,17 +106,21 @@ export default function Experiences() {
     }
   };
 
+  // refetch whenever search changes - no debounce yet, fine for now
   useEffect(() => { fetchExperiences(); }, [search]);
 
   const handleUpvote = async (id) => {
     try {
       const res = await axios.patch(`/api/experiences/${id}/upvote`);
+      // patch just the upvote count locally instead of refetching the whole list
       setExperiences(prev => prev.map(e => e._id === id ? { ...e, upvotes: res.data.upvotes } : e));
     } catch (err) {
+      // 401 most likely means they're not logged in
       toast.error('Login to upvote');
     }
   };
 
+  // dev/demo helper so the page isn't empty when testing or for new users
   const seedExperiences = async () => {
     setSeeding(true);
     try {
@@ -118,12 +130,14 @@ export default function Experiences() {
     } catch { toast.error('Failed'); } finally { setSeeding(false); }
   };
 
+  // helpers for the dynamic rounds array inside the share form
   const addRound = () => setForm(p => ({ ...p, rounds: [...p.rounds, { name: '', description: '', difficulty: 'Medium' }] }));
   const removeRound = (i) => setForm(p => ({ ...p, rounds: p.rounds.filter((_, idx) => idx !== i) }));
   const updateRound = (i, field, val) => setForm(p => ({ ...p, rounds: p.rounds.map((r, idx) => idx === i ? { ...r, [field]: val } : r) }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // quick required-field check before bothering the api
     if (!form.company || !form.role) return toast.error('Company and role are required');
     setSubmitting(true);
     try {
@@ -131,6 +145,7 @@ export default function Experiences() {
       toast.success('Experience shared! Thank you 🙏');
       setShowForm(false);
       fetchExperiences();
+      // reset back to defaults so the form's clean next time someone opens it
       setForm({ company: '', role: '', type: 'On-Campus', year: new Date().getFullYear(), package: '', tips: '', verdict: 'Selected', isAnonymous: false, rounds: [{ name: '', description: '', difficulty: 'Medium' }] });
     } catch (err) {
       toast.error(err.response?.data?.error || 'Failed to submit');
@@ -156,10 +171,10 @@ export default function Experiences() {
         </div>
       </div>
 
-      {/* Search */}
+      {/* triggers the useEffect refetch above on every keystroke */}
       <input type="text" className="input-field max-w-sm" placeholder="Search by company..." value={search} onChange={e => setSearch(e.target.value)} />
 
-      {/* Share Form */}
+      {/* share form, toggled by the button up top */}
       {showForm && (
         <div className="card border border-primary-500/20 animate-slide-up">
           <div className="flex items-center justify-between mb-5">
@@ -198,7 +213,7 @@ export default function Experiences() {
               </div>
             </div>
 
-            {/* Rounds */}
+            {/* dynamic rounds list - add/remove as many as the interview actually had */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="label mb-0">Interview Rounds</label>
@@ -212,6 +227,7 @@ export default function Experiences() {
                       <select className="input-field py-2 text-sm w-28" value={r.difficulty} onChange={e => updateRound(i, 'difficulty', e.target.value)}>
                         {['Easy', 'Medium', 'Hard'].map(d => <option key={d}>{d}</option>)}
                       </select>
+                      {/* don't let the rounds list go all the way to zero */}
                       {form.rounds.length > 1 && <button type="button" onClick={() => removeRound(i)} className="text-gray-600 hover:text-red-400 transition-colors"><X className="w-4 h-4" /></button>}
                     </div>
                     <textarea className="input-field py-2 text-sm resize-none min-h-16" placeholder="Describe what was asked in this round..." value={r.description} onChange={e => updateRound(i, 'description', e.target.value)} />
@@ -240,7 +256,7 @@ export default function Experiences() {
         </div>
       )}
 
-      {/* List */}
+      {/* skeleton while loading, real cards once data's in, empty state if there's nothing yet */}
       {loading ? (
         <div className="grid md:grid-cols-2 gap-4">
           {[...Array(4)].map((_, i) => <div key={i} className="h-48 rounded-2xl bg-white/3 animate-pulse" />)}
