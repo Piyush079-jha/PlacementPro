@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Upload, FileText, CheckCircle, XCircle, AlertCircle, Zap, TrendingUp, Target } from 'lucide-react';
+import { Upload, FileText, CheckCircle, XCircle, AlertCircle, Zap, TrendingUp, Target, RotateCcw, Search } from 'lucide-react';
 
 const ROLES = [
   'Software Engineer', 'Frontend Developer', 'Backend Developer',
@@ -9,6 +9,14 @@ const ROLES = [
   'DevOps Engineer', 'ML Engineer', 'Android Developer',
   'iOS Developer', 'Product Manager', 'UI/UX Designer',
   'Cloud Engineer', 'Cybersecurity Analyst', 'QA Engineer',
+];
+
+const LOADING_STEPS = [
+  { icon: '📄', text: 'Reading your resume...' },
+  { icon: '🔍', text: 'Scanning for keywords...' },
+  { icon: '🧠', text: 'Running AI analysis...' },
+  { icon: '📊', text: 'Scoring your resume...' },
+  { icon: '✨', text: 'Generating insights...' },
 ];
 
 const ScoreBar = ({ label, score, color = 'bg-primary-500' }) => (
@@ -43,10 +51,38 @@ const ScoreCircle = ({ score }) => {
   );
 };
 
+// Animated loading indicator
+const AnalyzingLoader = ({ step }) => (
+  <div className="flex flex-col items-center justify-center py-12 space-y-6">
+    {/* Spinning ring */}
+    <div className="relative w-20 h-20">
+      <div className="absolute inset-0 rounded-full border-4 border-white/5" />
+      <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary-500 animate-spin" />
+      <div className="absolute inset-0 flex items-center justify-center text-2xl">
+        {LOADING_STEPS[step]?.icon}
+      </div>
+    </div>
+    {/* Step text */}
+    <div className="text-center space-y-1">
+      <p className="text-white font-medium text-sm">{LOADING_STEPS[step]?.text}</p>
+      <p className="text-gray-600 text-xs">This takes about 10–15 seconds</p>
+    </div>
+    {/* Progress dots */}
+    <div className="flex gap-2">
+      {LOADING_STEPS.map((_, i) => (
+        <div key={i} className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${
+          i < step ? 'bg-primary-500' : i === step ? 'bg-primary-400 scale-125' : 'bg-white/10'
+        }`} />
+      ))}
+    </div>
+  </div>
+);
+
 export default function ResumeAnalyzer() {
   const [resumeText, setResumeText] = useState('');
   const [targetRole, setTargetRole] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [analysis, setAnalysis] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [dragging, setDragging] = useState(false);
@@ -54,6 +90,7 @@ export default function ResumeAnalyzer() {
   const [roleSuggestions, setRoleSuggestions] = useState([]);
   const [inputMode, setInputMode] = useState('text');
   const fileInputRef = useRef(null);
+  const stepIntervalRef = useRef(null);
 
   const handleFile = async (file) => {
     if (!file) return;
@@ -88,10 +125,25 @@ export default function ResumeAnalyzer() {
     setRoleSuggestions(matches);
   };
 
+  const startLoadingSteps = () => {
+    setLoadingStep(0);
+    let step = 0;
+    stepIntervalRef.current = setInterval(() => {
+      step = Math.min(step + 1, LOADING_STEPS.length - 1);
+      setLoadingStep(step);
+    }, 2500);
+  };
+
+  const stopLoadingSteps = () => {
+    if (stepIntervalRef.current) clearInterval(stepIntervalRef.current);
+  };
+
   const handleAnalyze = async () => {
-    if (!resumeText.trim() || resumeText.trim().length < 50) return toast.error('Please paste your resume text (minimum 50 characters)');
+    if (!resumeText.trim() || resumeText.trim().length < 50)
+      return toast.error('Please paste your resume text (minimum 50 characters)');
     setLoading(true);
     setAnalysis(null);
+    startLoadingSteps();
     try {
       const res = await axios.post('/api/resume/analyze', { resumeText, targetRole });
       setAnalysis(res.data.analysis);
@@ -100,11 +152,25 @@ export default function ResumeAnalyzer() {
     } catch (err) {
       toast.error(err.response?.data?.error || 'Analysis failed. Check your API key.');
     } finally {
+      stopLoadingSteps();
       setLoading(false);
     }
   };
 
-  const tabs = ['overview', 'improvements', 'skills', 'quickwins'];
+  const handleReset = () => {
+    setAnalysis(null);
+    setResumeText('');
+    setFileName('');
+    setTargetRole('');
+    setActiveTab('overview');
+  };
+
+  const tabs = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'improvements', label: 'Improvements' },
+    { key: 'skills', label: 'Skills' },
+    { key: 'quickwins', label: 'Quick Wins' },
+  ];
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -113,7 +179,7 @@ export default function ResumeAnalyzer() {
         <p className="text-gray-500">Get AI-powered feedback and improve your resume score</p>
       </div>
 
-      {!analysis && (
+      {!analysis && !loading && (
         <div className="grid md:grid-cols-5 gap-6">
           {/* Left — Input (3 cols) */}
           <div className="md:col-span-3 card space-y-4">
@@ -121,11 +187,11 @@ export default function ResumeAnalyzer() {
             {/* Tab switcher */}
             <div className="flex gap-1 p-1 bg-white/3 rounded-xl border border-white/5 w-fit">
               <button onClick={() => { setInputMode('text'); setFileName(''); }}
-                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${inputMode === 'text' ? 'bg-primary-500 text-white' : 'text-gray-500 hover:text-white'}`}>
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${inputMode === 'text' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20' : 'text-gray-500 hover:text-white'}`}>
                 <FileText className="w-3.5 h-3.5" /> Paste Text
               </button>
               <button onClick={() => { setInputMode('file'); setResumeText(''); }}
-                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${inputMode === 'file' ? 'bg-primary-500 text-white' : 'text-gray-500 hover:text-white'}`}>
+                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${inputMode === 'file' ? 'bg-primary-500 text-white shadow-lg shadow-primary-500/20' : 'text-gray-500 hover:text-white'}`}>
                 <Upload className="w-3.5 h-3.5" /> Upload File
               </button>
             </div>
@@ -151,9 +217,7 @@ export default function ResumeAnalyzer() {
                     ? <p className="text-sm text-primary-400 font-medium">{fileName} loaded ✓</p>
                     : <>
                         <p className="text-sm text-gray-400">Drop your resume here or <span className="text-primary-400 font-medium">browse</span></p>
-                        <p className="text-xs text-gray-600 mt-1 flex items-center justify-center gap-1">
-                          ✅ PDF supported &nbsp;·&nbsp; ✅ .txt supported
-                        </p>
+                        <p className="text-xs text-gray-600 mt-1">✅ PDF supported · ✅ .txt supported</p>
                       </>
                   }
                 </div>
@@ -211,10 +275,7 @@ export default function ResumeAnalyzer() {
               disabled={loading || resumeText.length < 50}
               className="btn-primary w-full flex items-center justify-center gap-2 py-3 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading
-                ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Analyzing with AI...</>
-                : <><Zap className="w-4 h-4" /> Analyze Resume</>
-              }
+              <Zap className="w-4 h-4" /> Analyze Resume
             </button>
           </div>
 
@@ -254,14 +315,31 @@ export default function ResumeAnalyzer() {
         </div>
       )}
 
-      {/* Show input again after analysis */}
+      {/* Loading state — full card */}
+      {loading && (
+        <div className="card">
+          <AnalyzingLoader step={loadingStep} />
+        </div>
+      )}
+
+      {/* Results header */}
       {analysis && (
-        <div className="card space-y-4">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-400">Analyzing: <span className="text-white">{resumeText.slice(0, 60)}...</span></p>
-            <button onClick={() => { setAnalysis(null); setResumeText(''); setFileName(''); }}
-              className="text-xs text-primary-400 hover:text-primary-300 border border-primary-500/20 px-3 py-1.5 rounded-lg transition-colors">
-              Analyze New Resume
+        <div className="card">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-green-500/10 flex items-center justify-center flex-shrink-0">
+                <CheckCircle className="w-4 h-4 text-green-400" />
+              </div>
+              <p className="text-sm text-gray-400 truncate">
+                Analyzed: <span className="text-white">{resumeText.slice(0, 55)}...</span>
+              </p>
+            </div>
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-2 text-sm font-medium text-white bg-primary-500 hover:bg-primary-600 px-4 py-2 rounded-xl transition-all duration-200 shadow-lg shadow-primary-500/20 flex-shrink-0"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              New Resume
             </button>
           </div>
         </div>
@@ -288,12 +366,23 @@ export default function ResumeAnalyzer() {
             </div>
           </div>
 
-          {/* Tabs */}
-          <div className="flex gap-1 p-1 bg-white/3 rounded-xl border border-white/5 w-fit">
+          {/* Tabs — underline style with glow */}
+          <div className="flex gap-0 border-b border-white/5">
             {tabs.map(t => (
-              <button key={t} onClick={() => setActiveTab(t)}
-                className={`px-4 py-1.5 rounded-lg text-sm font-medium transition-all capitalize ${activeTab === t ? 'bg-primary-500 text-white' : 'text-gray-500 hover:text-white'}`}
-              >{t === 'quickwins' ? 'Quick Wins' : t}</button>
+              <button
+                key={t.key}
+                onClick={() => setActiveTab(t.key)}
+                className={`relative px-5 py-2.5 text-sm font-medium transition-all duration-200 ${
+                  activeTab === t.key
+                    ? 'text-primary-400'
+                    : 'text-gray-500 hover:text-gray-300'
+                }`}
+              >
+                {t.label}
+                {activeTab === t.key && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500 rounded-full shadow-[0_0_8px_2px_rgba(139,92,246,0.4)]" />
+                )}
+              </button>
             ))}
           </div>
 
@@ -315,14 +404,26 @@ export default function ResumeAnalyzer() {
               </div>
               <div className="card">
                 <h3 className="font-display font-semibold text-red-400 mb-3 flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4" /> Missing Keywords
+                  <Search className="w-4 h-4" /> Missing Keywords
                 </h3>
-                <div className="flex flex-wrap gap-2">
-                  {(analysis.missingKeywords || []).map((k, i) => (
-                    <span key={i} className="badge bg-red-500/10 text-red-400 border border-red-500/20">{k}</span>
-                  ))}
-                  {(!analysis.missingKeywords?.length) && <p className="text-sm text-gray-600">No critical keywords missing!</p>}
-                </div>
+                {(analysis.missingKeywords?.length > 0) ? (
+                  <div className="flex flex-wrap gap-2">
+                    {(analysis.missingKeywords || []).map((k, i) => (
+                      <span
+                        key={i}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium bg-red-500/10 text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-colors"
+                      >
+                        <XCircle className="w-3 h-3 text-red-400 flex-shrink-0" />
+                        {k}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-green-400">
+                    <CheckCircle className="w-4 h-4" />
+                    No critical keywords missing!
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -366,7 +467,7 @@ export default function ResumeAnalyzer() {
                   {(analysis.skillGaps || []).map((sg, i) => (
                     <div key={i} className="flex items-center justify-between">
                       <span className="text-sm text-gray-300">{sg.skill}</span>
-                      <span className={`badge text-xs ${sg.priority === 'High' ? 'bg-red-500/10 text-red-400' : sg.priority === 'Medium' ? 'bg-yellow-500/10 text-yellow-400' : 'bg-blue-500/10 text-blue-400'}`}>
+                      <span className={`badge text-xs ${sg.priority === 'High' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : sg.priority === 'Medium' ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20' : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'}`}>
                         {sg.priority}
                       </span>
                     </div>
