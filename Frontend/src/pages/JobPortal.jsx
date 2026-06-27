@@ -1,55 +1,77 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Briefcase, MapPin, Clock, DollarSign, ExternalLink, Search, Filter, Star, Users } from 'lucide-react';
+import { Briefcase, MapPin, DollarSign, ExternalLink, Search, Star, Users } from 'lucide-react';
 
-const typeColors = { 'Full-time': 'bg-green-500/10 text-green-400', 'Internship': 'bg-blue-500/10 text-blue-400', 'Remote': 'bg-purple-500/10 text-purple-400', 'Part-time': 'bg-yellow-500/10 text-yellow-400' };
+const typeColors = {
+  'Full-time': 'bg-green-500/10 text-green-400',
+  'Internship': 'bg-blue-500/10 text-blue-400',
+  'Remote': 'bg-purple-500/10 text-purple-400',
+  'Part-time': 'bg-yellow-500/10 text-yellow-400'
+};
 
-const JobCard = ({ job, onApply }) => (
-  <div className={`card hover:scale-[1.01] transition-all duration-200 ${job.isFeatured ? 'border border-primary-500/25' : ''}`}>
-    {job.isFeatured && (
-      <div className="flex items-center gap-1 text-xs text-primary-400 font-medium mb-3">
-        <Star className="w-3 h-3 fill-current" /> Featured
-      </div>
-    )}
-    <div className="flex items-start justify-between gap-3 mb-3">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-700/20 border border-primary-500/20 flex items-center justify-center text-sm font-bold text-primary-300">
-          {job.company?.[0] || 'C'}
+const JobCard = ({ job, onApply }) => {
+  const hasLink = job.applyLink && job.applyLink !== '#';
+
+  const handleApply = (e) => {
+    if (!hasLink) {
+      e.preventDefault();
+      toast.error('Application link not available for this job');
+      return;
+    }
+    onApply(job._id);
+  };
+
+  return (
+    <div className={`card hover:scale-[1.01] transition-all duration-200 ${job.isFeatured ? 'border border-primary-500/25' : ''}`}>
+      {job.isFeatured && (
+        <div className="flex items-center gap-1 text-xs text-primary-400 font-medium mb-3">
+          <Star className="w-3 h-3 fill-current" /> Featured
         </div>
-        <div>
-          <h3 className="font-semibold text-white text-sm leading-snug">{job.title}</h3>
-          <p className="text-gray-500 text-xs">{job.company}</p>
+      )}
+      <div className="flex items-start justify-between gap-3 mb-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500/20 to-primary-700/20 border border-primary-500/20 flex items-center justify-center text-sm font-bold text-primary-300">
+            {job.company?.[0] || 'C'}
+          </div>
+          <div>
+            <h3 className="font-semibold text-white text-sm leading-snug">{job.title}</h3>
+            <p className="text-gray-500 text-xs">{job.company}</p>
+          </div>
         </div>
+        <span className={`badge ${typeColors[job.type] || 'bg-gray-500/10 text-gray-400'} flex-shrink-0`}>{job.type}</span>
       </div>
-      <span className={`badge ${typeColors[job.type] || 'bg-gray-500/10 text-gray-400'} flex-shrink-0`}>{job.type}</span>
-    </div>
 
-    <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-3">
-      {job.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>}
-      {job.salary && <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" />{job.salary}</span>}
-      {job.applicants > 0 && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{job.applicants} applied</span>}
-    </div>
-
-    {job.skills?.length > 0 && (
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        {job.skills.slice(0, 4).map((s, i) => (
-          <span key={i} className="text-xs px-2 py-0.5 rounded-md bg-white/4 text-gray-400 border border-white/6">{s}</span>
-        ))}
-        {job.skills.length > 4 && <span className="text-xs text-gray-600">+{job.skills.length - 4} more</span>}
+      <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-3">
+        {job.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{job.location}</span>}
+        {job.salary && <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" />{job.salary}</span>}
+        {job.applicants > 0 && <span className="flex items-center gap-1"><Users className="w-3 h-3" />{job.applicants} applied</span>}
       </div>
-    )}
 
-    <div className="flex items-center gap-2 pt-3 border-t border-white/5">
-      <a href={job.applyLink || '#'} target="_blank" rel="noopener noreferrer"
-        onClick={() => onApply(job._id)}
-        className="btn-primary text-xs py-2 px-4 flex items-center gap-1.5 flex-1 justify-center">
-        Apply Now <ExternalLink className="w-3 h-3" />
-      </a>
-      {job.source && <span className="text-xs text-gray-600 truncate">{job.source}</span>}
+      {job.skills?.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {job.skills.slice(0, 4).map((s, i) => (
+            <span key={i} className="text-xs px-2 py-0.5 rounded-md bg-white/4 text-gray-400 border border-white/6">{s}</span>
+          ))}
+          {job.skills.length > 4 && <span className="text-xs text-gray-600">+{job.skills.length - 4} more</span>}
+        </div>
+      )}
+
+      <div className="flex items-center gap-2 pt-3 border-t border-white/5">
+        <a
+          href={hasLink ? job.applyLink : undefined}
+          target={hasLink ? '_blank' : undefined}
+          rel="noopener noreferrer"
+          onClick={handleApply}
+          className={`btn-primary text-xs py-2 px-4 flex items-center gap-1.5 flex-1 justify-center ${!hasLink ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          Apply Now <ExternalLink className="w-3 h-3" />
+        </a>
+        {job.source && <span className="text-xs text-gray-600 truncate">{job.source}</span>}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default function JobPortal() {
   const [jobs, setJobs] = useState([]);
@@ -127,7 +149,6 @@ export default function JobPortal() {
 
       <p className="text-sm text-gray-500">{total} jobs found</p>
 
-      {/* Jobs grid */}
       {loading ? (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[...Array(6)].map((_, i) => <div key={i} className="h-52 rounded-2xl bg-white/3 animate-pulse" />)}
