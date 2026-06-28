@@ -4,6 +4,8 @@ const auth = require('../middleware/auth');
 const { callClaude, parseJSON } = require('../config/ai');
 const Job = require('../models/Job');
 const User = require('../models/User');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 // Get all jobs with filters
 router.get('/', async (req, res) => {
@@ -53,16 +55,74 @@ router.post('/seed', async (req, res) => {
   }
 });
 
+// Scrape job text from a URL — targets job content blocks, not full page noise
+async function scrapeJobFromUrl(url) {
+  const { data } = await axios.get(url, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+    },
+    timeout: 8000
+  });
+
+  const $ = cheerio.load(data);
+
+  // Strip noise first
+  $('script, style, nav, header, footer, iframe, noscript, aside, .cookie, .banner, .ad, .sidebar, .menu, .popup').remove();
+
+  // Try job-specific selectors in priority order
+  const jobSelectors = [
+    '[class*="job-description"]',
+    '[class*="jobDescription"]',
+    '[class*="job-detail"]',
+    '[class*="jobDetail"]',
+    '[class*="job-content"]',
+    '[class*="description"]',
+    '.internship_meta',         // Internshala
+    '.job-description',         // Naukri
+    '.job-view-layout',         // LinkedIn (usually blocked)
+    'main',
+    'article',
+    '#job-details',
+  ];
+
+  let text = '';
+  for (const selector of jobSelectors) {
+    const el = $(selector).first();
+    if (el.length && el.text().trim().length > 200) {
+      text = el.text().replace(/\s+/g, ' ').trim();
+      break;
+    }
+  }
+
+  // Fallback to full body if no specific block found
+  if (!text) {
+    text = $('body').text().replace(/\s+/g, ' ').trim();
+  }
+
+  return text.substring(0, 3000);
+}
+
 // Detect fake job
 router.post('/detect', auth, async (req, res) => {
   try {
-    const { jobDescription, jobUrl } = req.body;
-    if (!jobDescription && !jobUrl) return res.status(400).json({ error: 'Job description or URL required' });
+    let { jobDescription, jobUrl } = req.body;
+    if (!jobDescription && !jobUrl)
+      return res.status(400).json({ error: 'Job description or URL required' });
 
-    const systemPrompt = `You are an expert in identifying fraudulent job postings, especially for Indian job market. 
+    // If URL provided, scrape the actual page content
+    if (jobUrl && !jobDescription) {
+      try {
+        jobDescription = await scrapeJobFromUrl(jobUrl);
+      } catch (e) {
+        return res.status(400).json({
+          error: 'Could not fetch that URL (site may block scraping). Please paste the job description directly instead.'
+        });
+      }
+    }
+
+    const systemPrompt = `You are an expert in identifying fraudulent job postings, especially for the Indian job market. 
 Analyze job postings for red flags. Always respond with valid JSON only.`;
 
-    const content = jobDescription || `Job URL: ${jobUrl}`;
     const userMessage = `Analyze this job posting for authenticity. Look for: unrealistic salaries, vague descriptions, requests for payment/documents, suspicious contact info, too-good-to-be-true offers, pressure tactics.
 
 Return JSON:
@@ -76,7 +136,7 @@ Return JSON:
   "recommendation": "what the user should do"
 }
 
-Job posting: ${content.substring(0, 2000)}`;
+Job posting: ${jobDescription.substring(0, 2500)}`;
 
     const result = await callClaude(systemPrompt, userMessage, 800);
     const detection = parseJSON(result);
