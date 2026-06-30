@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { MessageSquare, Play, CheckCircle, ChevronRight, Award, RotateCcw, Clock } from 'lucide-react';
+import { MessageSquare, Play, CheckCircle, ChevronRight, Award, RotateCcw, Clock, Video } from 'lucide-react';
+import VideoInterview from './VideoInterview';
 
 const roles = ['Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Data Scientist', 'Data Analyst', 'DevOps Engineer', 'ML Engineer', 'Android Developer', 'Product Manager'];
 const difficulties = ['Easy', 'Medium', 'Hard'];
 const types = ['mixed', 'Technical', 'Behavioral', 'HR', 'DSA'];
 
-const STAGES = { SETUP: 'setup', ACTIVE: 'active', REVIEW: 'review', RESULTS: 'results' };
+const STAGES = { MODE: 'mode', SETUP: 'setup', VIDEO_SETUP: 'video_setup', ACTIVE: 'active', REVIEW: 'review', RESULTS: 'results' };
 
 const ScoreBadge = ({ score }) => {
   const color = score >= 8 ? 'text-green-400 bg-green-500/10 border-green-500/20' : score >= 6 ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20';
@@ -16,7 +17,7 @@ const ScoreBadge = ({ score }) => {
 
 export default function Interview() {
   const [config, setConfig] = useState({ role: '', difficulty: 'Medium', count: 5, type: 'mixed' });
-  const [stage, setStage] = useState(STAGES.SETUP);
+  const [stage, setStage] = useState(STAGES.MODE);
   const [questions, setQuestions] = useState([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
@@ -83,17 +84,64 @@ export default function Interview() {
     }
   };
 
-  const reset = () => { setStage(STAGES.SETUP); setQuestions([]); setAnswers({}); setEvaluations({}); setSaved(false); };
+  const reset = () => { setStage(STAGES.MODE); setQuestions([]); setAnswers({}); setEvaluations({}); setSaved(false); };
 
   const avgScore = () => {
     const scores = Object.values(evaluations).filter(e => e?.score != null).map(e => e.score);
     return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) : 0;
   };
 
-  if (stage === STAGES.SETUP) return (
+  /* ── MODE PICKER ── */
+  if (stage === STAGES.MODE) return (
     <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="text-3xl font-display font-bold text-white mb-1">Interview Prep</h1>
+        <p className="text-gray-500">AI-powered mock interviews with real-time evaluation and feedback</p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl">
+        <button
+          onClick={() => setStage(STAGES.SETUP)}
+          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
+        >
+          <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
+            <MessageSquare className="w-5 h-5 text-primary-400" />
+          </div>
+          <h2 className="font-display font-semibold text-white text-lg">Text Interview</h2>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            Classic written Q&A. Read each question, type your answer, and get instant AI scoring and feedback.
+          </p>
+          <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
+            Start text interview <ChevronRight className="w-4 h-4" />
+          </span>
+        </button>
+
+        <button
+          onClick={() => setStage(STAGES.VIDEO_SETUP)}
+          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group relative overflow-hidden"
+        >
+          <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wide bg-primary-500/15 text-primary-400 px-2 py-0.5 rounded-full">New</span>
+          <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
+            <Video className="w-5 h-5 text-primary-400" />
+          </div>
+          <h2 className="font-display font-semibold text-white text-lg">Video Interview</h2>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            A live, AI-led interview with your webcam and voice — the interviewer speaks questions aloud and listens to your spoken answers, just like a real call.
+          </p>
+          <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
+            Start video interview <ChevronRight className="w-4 h-4" />
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+
+  if (stage === STAGES.VIDEO_SETUP) return <VideoInterview onBack={() => setStage(STAGES.MODE)} />;
+
+  if (stage === STAGES.SETUP) return (
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-3xl font-display font-bold text-white mb-1">Text Interview</h1>
         <p className="text-gray-500">AI-powered mock interviews with real-time evaluation and feedback</p>
       </div>
 
@@ -131,6 +179,7 @@ export default function Interview() {
         <button onClick={startInterview} disabled={loading || !config.role} className="btn-primary w-full py-3 flex items-center justify-center gap-2 disabled:opacity-50">
           {loading ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating...</> : <><Play className="w-4 h-4" /> Start Interview</>}
         </button>
+        <button onClick={() => setStage(STAGES.MODE)} className="btn-ghost w-full text-sm">← Back to mode selection</button>
       </div>
     </div>
   );

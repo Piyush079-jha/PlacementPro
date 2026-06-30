@@ -70,6 +70,64 @@ Return JSON:
   }
 });
 
+// Generate the next question/feedback turn in a live video interview.
+// Unlike /questions (batch upfront), this reacts turn-by-turn to the conversation so far,
+// which is what makes the video mode feel like a real, responsive interviewer.
+router.post('/video-turn', auth, async (req, res) => {
+  try {
+    const { role, difficulty, type, history = [], turnNumber, totalQuestions } = req.body;
+    if (!role) return res.status(400).json({ error: 'Role is required' });
+    if (!totalQuestions) return res.status(400).json({ error: 'totalQuestions is required' });
+
+    const isFirstTurn = turnNumber === 0 || history.length === 0;
+    const isFinalTurn = turnNumber >= totalQuestions - 1;
+
+    const systemPrompt = `You are a senior, professional interviewer conducting a live video interview at a top Indian tech company.
+You speak naturally, one question at a time, and briefly acknowledge the candidate's previous answer before moving on.
+Keep your spoken text concise (2-4 sentences max) since it will be read aloud by text-to-speech.
+Respond with valid JSON only.`;
+
+    const historyText = history.map((h, i) =>
+      `Q${i + 1}: ${h.question}\nCandidate's answer: ${h.answer}`
+    ).join('\n\n');
+
+    const userMessage = isFirstTurn
+      ? `Start a live ${difficulty || 'Medium'} difficulty ${type || 'mixed'} interview for a ${role} position. Greet the candidate briefly and professionally, then ask your first question.
+
+Return JSON:
+{
+  "spokenText": "brief greeting + the question, written to be spoken aloud naturally",
+  "question": "the question text alone",
+  "questionType": "Technical|Behavioral|HR|DSA"
+}`
+      : `Interview so far for a ${role} position (${difficulty || 'Medium'} difficulty):
+
+${historyText}
+
+${isFinalTurn
+  ? `This is the final question. First, give brief spoken feedback (1-2 sentences) on the candidate's last answer, score it, then ask one last strong question.`
+  : `Give brief spoken feedback (1-2 sentences) on the candidate's last answer, score it, then ask the next question. Vary the question type naturally and avoid repeating earlier topics.`}
+
+Return JSON:
+{
+  "spokenText": "brief acknowledgment/feedback on the previous answer, spoken naturally, then the next question",
+  "previousAnswerScore": <0-10>,
+  "previousAnswerFeedback": "short feedback text",
+  "question": "the next question text alone",
+  "questionType": "Technical|Behavioral|HR|DSA",
+  "isLastQuestion": ${isFinalTurn}
+}`;
+
+    const result = await callClaude(systemPrompt, userMessage, 600);
+    const turn = parseJSON(result);
+    if (!turn) return res.status(500).json({ error: 'Failed to generate next turn. Please try again.' });
+
+    res.json({ success: true, turn });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Save completed interview session
 router.post('/save', auth, async (req, res) => {
   try {
