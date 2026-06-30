@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Mic, MicOff, Video, VideoOff, PhoneOff, Loader2, Send } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Loader2, Send, Bot } from 'lucide-react';
 
 export default function VideoInterview({ onBack, role = 'Full Stack Developer', difficulty = 'Medium', type = 'mixed', totalQuestions = 5 }) {
   const videoRef = useRef(null);
@@ -20,6 +20,8 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const [aiLoading, setAiLoading] = useState(false);
   const [isLastQuestion, setIsLastQuestion] = useState(false);
   const [interviewEnded, setInterviewEnded] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
+//   const [speaking, setSpeaking] = useState(false);
 
   useEffect(() => {
     startCamera();
@@ -37,6 +39,9 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1;
+    utterance.onstart = () => setSpeaking(true);
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
     window.speechSynthesis.speak(utterance);
   };
 
@@ -116,34 +121,69 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
         <p className="text-gray-500">{status}</p>
       </div>
 
-      <div className="card relative aspect-video bg-black/40 flex items-center justify-center overflow-hidden">
-        {loading && (
-          <div className="flex flex-col items-center gap-2 text-gray-400">
-            <Loader2 className="w-6 h-6 animate-spin" />
-            <span className="text-sm">Setting up your camera...</span>
+      {/* Main call stage */}
+      <div className="card relative aspect-video bg-black/50 overflow-hidden p-0">
+        {/* AI Interviewer — main screen */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-b from-[#0d1117] to-[#161b22]">
+          <div className="relative">
+            <div className={`w-28 h-28 rounded-full bg-primary-500/15 border-2 border-primary-500/30 flex items-center justify-center transition-all ${speaking ? 'scale-110 shadow-[0_0_40px_rgba(59,130,246,0.4)]' : ''}`}>
+              <Bot className="w-12 h-12 text-primary-400" />
+            </div>
+            {speaking && (
+              <>
+                <span className="absolute inset-0 rounded-full border-2 border-primary-400/40 animate-ping" />
+                <span className="absolute -inset-3 rounded-full border border-primary-400/20 animate-pulse" />
+              </>
+            )}
           </div>
-        )}
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          className={`w-full h-full object-cover rounded-xl ${loading ? 'hidden' : ''}`}
-        />
-      </div>
-
-      {!loading && !interviewEnded && (
-        <div className="card border border-primary-500/15 space-y-3">
-          <div className="flex items-center gap-2">
-            <span className="badge bg-primary-500/15 text-primary-400 text-xs">
-              Question {turnNumber + 1}/{totalQuestions}
-            </span>
-            {aiLoading && <span className="text-xs text-gray-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Interviewer thinking...</span>}
-          </div>
-          <p className="text-white text-lg leading-relaxed font-medium">
-            {spokenText || 'Loading first question...'}
+          <p className="text-white font-display font-semibold mt-4">AI Interviewer</p>
+          <p className="text-gray-500 text-xs mt-1">
+            {aiLoading ? 'Thinking...' : speaking ? 'Speaking...' : 'Listening'}
           </p>
 
+          {/* Live caption style question */}
+          <div className="absolute bottom-6 left-6 right-6 max-w-2xl mx-auto">
+            <div className="bg-black/60 backdrop-blur-md rounded-xl px-5 py-3 border border-white/10">
+              {aiLoading ? (
+                <span className="text-gray-400 text-sm flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" /> Preparing next question...
+                </span>
+              ) : (
+                <p className="text-white text-sm leading-relaxed">{spokenText || 'Connecting...'}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Your camera — small corner box, Zoom-style */}
+        <div className="absolute top-4 right-4 w-40 sm:w-52 aspect-video rounded-lg overflow-hidden border border-white/15 shadow-lg bg-black">
+          {loading && (
+            <div className="w-full h-full flex items-center justify-center text-gray-500">
+              <Loader2 className="w-5 h-5 animate-spin" />
+            </div>
+          )}
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            className={`w-full h-full object-cover ${loading ? 'hidden' : ''}`}
+          />
+          <span className="absolute bottom-1 left-1.5 text-[10px] text-white/80 bg-black/40 px-1.5 py-0.5 rounded">You</span>
+        </div>
+
+        {/* Progress badge */}
+        <div className="absolute top-4 left-4">
+          <span className="badge bg-black/50 text-gray-300 border border-white/10 text-xs">
+            Question {turnNumber + 1}/{totalQuestions}
+          </span>
+        </div>
+      </div>
+
+      {/* Answer panel */}
+      {!loading && !interviewEnded && (
+        <div className="card border border-primary-500/15 space-y-3">
+          <label className="label">Your Answer</label>
           <textarea
             className="input-field min-h-28 resize-none"
             placeholder="Speak or type your answer here..."

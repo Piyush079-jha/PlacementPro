@@ -12,9 +12,14 @@ router.post('/questions', auth, async (req, res) => {
     if (!role) return res.status(400).json({ error: 'Role is required' });
 
     const systemPrompt = `You are a senior technical interviewer at top Indian tech companies. 
-Generate realistic interview questions. Respond with valid JSON only.`;
+Generate realistic, VARIED interview questions — avoid generic, overused, or repetitive questions like "tell me about yourself" or basic textbook definitions unless explicitly asked.
+Each time you are called, generate a fresh, different set of questions even for the same role — vary the angle, sub-topic, and phrasing. Respond with valid JSON only.`;
+
+    const seedTopics = ['system design', 'real-world debugging', 'edge cases', 'trade-offs', 'past project scenarios', 'optimization', 'collaboration', 'recent industry practices', 'architecture decisions', 'failure handling'];
+    const randomAngle = seedTopics[Math.floor(Math.random() * seedTopics.length)];
 
     const userMessage = `Generate ${count} ${difficulty || 'Medium'} difficulty ${type} interview questions for a ${role} position.
+Lean toward the angle of "${randomAngle}" where relevant, and ensure variety — do not reuse common generic questions.
 Return JSON array:
 [
   {
@@ -85,6 +90,7 @@ router.post('/video-turn', auth, async (req, res) => {
     const systemPrompt = `You are a senior, professional interviewer conducting a live video interview at a top Indian tech company.
 You speak naturally, one question at a time, and briefly acknowledge the candidate's previous answer before moving on.
 Keep your spoken text concise (2-4 sentences max) since it will be read aloud by text-to-speech.
+Always generate fresh, varied questions — avoid generic or repeated questions across sessions, and avoid overlapping topics within the same interview.
 Respond with valid JSON only.`;
 
     const historyText = history.map((h, i) =>
