@@ -103,13 +103,14 @@ Respond with valid JSON only.`;
     ).join('\n\n');
 
     const userMessage = isFirstTurn
-      ? `Start a live ${difficulty || 'Medium'} difficulty ${type || 'mixed'} interview for a ${role} position. Greet the candidate briefly and professionally, then ask your first question.
+      ? `Start a live ${difficulty || 'Medium'} difficulty ${type || 'mixed'} interview for a ${role} position.
+This is the opening of the interview — ease the candidate in like a real interviewer would. Greet them warmly and professionally, then ask a light, easy opening question (e.g. "tell me about yourself", a quick icebreaker about their background/experience, or a simple intro-level question). Do NOT start with a hard technical or DSA question — save depth for later turns once the candidate is warmed up.
 
 Return JSON:
 {
-  "spokenText": "brief greeting + the question, written to be spoken aloud naturally",
+  "spokenText": "brief warm greeting + the easy opening question, written to be spoken aloud naturally",
   "question": "the question text alone",
-  "questionType": "Technical|Behavioral|HR|DSA"
+  "questionType": "Behavioral|HR"
 }`
       : `Interview so far for a ${role} position (${difficulty || 'Medium'} difficulty):
 

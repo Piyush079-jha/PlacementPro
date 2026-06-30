@@ -47,16 +47,27 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
-      toast.error('Voice input not supported in this browser. Try Chrome.');
+      toast.error('Voice input not supported in this browser. Please use Chrome or Edge.');
+      console.warn('SpeechRecognition is not available on window.');
       return;
     }
     if (listening) {
-      recognitionRef.current.stop();
+      try {
+        recognitionRef.current.stop();
+      } catch (err) {
+        console.error('Error stopping recognition:', err);
+      }
       setListening(false);
     } else {
       setAnswer('');
-      recognitionRef.current.start();
-      setListening(true);
+      try {
+        recognitionRef.current.start();
+        setListening(true);
+      } catch (err) {
+        console.error('Error starting recognition:', err);
+        toast.error('Could not start voice input. Check mic permissions.');
+        setListening(false);
+      }
     }
   };
 //   const [speaking, setSpeaking] = useState(false);
