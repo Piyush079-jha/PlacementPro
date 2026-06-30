@@ -88,7 +88,12 @@ router.post('/video-turn', auth, async (req, res) => {
     const isFinalTurn = turnNumber >= totalQuestions - 1;
 
     const systemPrompt = `You are a senior, professional interviewer conducting a live video interview at a top Indian tech company.
-You speak naturally, one question at a time, and briefly acknowledge the candidate's previous answer before moving on.
+You speak naturally, one question at a time, and briefly acknowledge the candidate's previous answer before moving on — like a real human interviewer reacting in the moment, not reading a script.
+Adapt your next question based on the DEPTH and QUALITY of the candidate's last answer:
+- If their answer was shallow or vague, ask a probing follow-up on the SAME topic to test real understanding.
+- If their answer was strong, move to a new topic or increase difficulty.
+- If they mentioned a specific technology, project, or claim, dig into it with a targeted follow-up.
+While generating each turn, silently assess (for internal scoring) the candidate's communication clarity, technical depth, problem-solving approach, and confidence — this will be used for final feedback, but do not say scores aloud during the interview.
 Keep your spoken text concise (2-4 sentences max) since it will be read aloud by text-to-speech.
 Always generate fresh, varied questions — avoid generic or repeated questions across sessions, and avoid overlapping topics within the same interview.
 Respond with valid JSON only.`;
@@ -129,6 +134,44 @@ Return JSON:
     if (!turn) return res.status(500).json({ error: 'Failed to generate next turn. Please try again.' });
 
     res.json({ success: true, turn });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Generate comprehensive final feedback for a completed video interview
+router.post('/video-summary', auth, async (req, res) => {
+  try {
+    const { role, difficulty, history = [] } = req.body;
+    if (!history.length) return res.status(400).json({ error: 'No interview history provided' });
+
+    const systemPrompt = `You are a senior technical interviewer providing a final, honest performance review after a live interview.
+Be specific, constructive, and actionable — like real interview feedback a candidate would get from a hiring manager. Respond with valid JSON only.`;
+
+    const transcript = history.map((h, i) => `Q${i + 1}: ${h.question}\nAnswer: ${h.answer}`).join('\n\n');
+
+    const userMessage = `Review this full interview transcript for a ${role} position (${difficulty || 'Medium'} difficulty):
+
+${transcript}
+
+Evaluate the candidate across these dimensions and return JSON:
+{
+  "overallScore": <0-100>,
+  "communicationScore": <0-10>,
+  "technicalScore": <0-10>,
+  "problemSolvingScore": <0-10>,
+  "confidenceScore": <0-10>,
+  "strengths": ["specific strength 1", "specific strength 2"],
+  "weaknesses": ["specific weakness 1", "specific weakness 2"],
+  "actionableTips": ["concrete tip 1", "concrete tip 2", "concrete tip 3"],
+  "summary": "2-3 sentence honest overall assessment, like a hiring manager would write"
+}`;
+
+    const result = await callClaude(systemPrompt, userMessage, 900);
+    const feedback = parseJSON(result);
+    if (!feedback) return res.status(500).json({ error: 'Failed to generate feedback' });
+
+    res.json({ success: true, feedback });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

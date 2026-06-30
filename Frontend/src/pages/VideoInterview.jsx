@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Mic, MicOff, Video, VideoOff, PhoneOff, Loader2, Send, Bot } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Loader2, Send, Bot, AudioLines } from 'lucide-react';
 
 export default function VideoInterview({ onBack, role = 'Full Stack Developer', difficulty = 'Medium', type = 'mixed', totalQuestions = 5 }) {
   const videoRef = useRef(null);
@@ -21,6 +21,44 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const [isLastQuestion, setIsLastQuestion] = useState(false);
   const [interviewEnded, setInterviewEnded] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [listening, setListening] = useState(false);
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
+
+    recognition.onresult = (event) => {
+      let transcript = '';
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      setAnswer(transcript);
+    };
+    recognition.onerror = () => setListening(false);
+    recognition.onend = () => setListening(false);
+
+    recognitionRef.current = recognition;
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      toast.error('Voice input not supported in this browser. Try Chrome.');
+      return;
+    }
+    if (listening) {
+      recognitionRef.current.stop();
+      setListening(false);
+    } else {
+      setAnswer('');
+      recognitionRef.current.start();
+      setListening(true);
+    }
+  };
 //   const [speaking, setSpeaking] = useState(false);
 
   useEffect(() => {
@@ -67,7 +105,10 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     }
   };
 
-  const submitAnswer = () => {
+  const [feedback, setFeedback] = useState(null);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+
+  const submitAnswer = async () => {
     if (!answer.trim() || answer.trim().length < 5) return toast.error('Please answer before continuing');
     const newHistory = [...history, { question: currentQuestion, answer }];
     setHistory(newHistory);
@@ -75,7 +116,15 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     if (isLastQuestion) {
       setInterviewEnded(true);
       window.speechSynthesis.cancel();
-      toast.success('Interview complete!');
+      setFeedbackLoading(true);
+      try {
+        const res = await axios.post('/api/interview/video-summary', { role, difficulty, history: newHistory });
+        setFeedback(res.data.feedback);
+      } catch (err) {
+        toast.error('Failed to generate final feedback');
+      } finally {
+        setFeedbackLoading(false);
+      }
     } else {
       fetchNextTurn(newHistory);
     }
@@ -172,10 +221,10 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           <span className="absolute bottom-1 left-1.5 text-[10px] text-white/80 bg-black/40 px-1.5 py-0.5 rounded">You</span>
         </div>
 
-        {/* Progress badge */}
+        {/* Live status badge instead of progress count */}
         <div className="absolute top-4 left-4">
-          <span className="badge bg-black/50 text-gray-300 border border-white/10 text-xs">
-            Question {turnNumber + 1}/{totalQuestions}
+          <span className="badge bg-black/50 text-gray-300 border border-white/10 text-xs flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" /> Live Interview
           </span>
         </div>
       </div>
@@ -183,16 +232,26 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       {/* Answer panel */}
       {!loading && !interviewEnded && (
         <div className="card border border-primary-500/15 space-y-3">
-          <label className="label">Your Answer</label>
+          <div className="flex items-center justify-between">
+            <label className="label mb-0">Your Answer</label>
+            <button
+              onClick={toggleListening}
+              disabled={aiLoading}
+              className={`flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border transition-all ${listening ? 'bg-red-500/15 border-red-500/30 text-red-400' : 'border-primary-500/30 text-primary-400 hover:bg-primary-500/10'}`}
+            >
+              {listening ? <AudioLines className="w-3.5 h-3.5 animate-pulse" /> : <Mic className="w-3.5 h-3.5" />}
+              {listening ? 'Listening...' : 'Speak Answer'}
+            </button>
+          </div>
           <textarea
             className="input-field min-h-28 resize-none"
-            placeholder="Speak or type your answer here..."
+            placeholder="Click 'Speak Answer' or type here..."
             value={answer}
             onChange={e => setAnswer(e.target.value)}
             disabled={aiLoading}
           />
           <button
-            onClick={submitAnswer}
+            onClick={() => { if (listening) toggleListening(); submitAnswer(); }}
             disabled={aiLoading || !answer.trim()}
             className="btn-primary flex items-center gap-2 disabled:opacity-50"
           >
@@ -202,9 +261,65 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       )}
 
       {interviewEnded && (
-        <div className="card text-center space-y-2">
-          <h2 className="text-xl font-display font-bold text-white">Interview Complete 🎉</h2>
-          <p className="text-gray-400 text-sm">Great job! You answered {history.length} questions.</p>
+        <div className="card space-y-5">
+          <div className="text-center">
+            <h2 className="text-xl font-display font-bold text-white">Interview Complete 🎉</h2>
+            <p className="text-gray-400 text-sm">Here's your detailed performance review</p>
+          </div>
+
+          {feedbackLoading && (
+            <div className="flex flex-col items-center gap-2 py-8 text-gray-400">
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span className="text-sm">Analyzing your performance...</span>
+            </div>
+          )}
+
+          {feedback && (
+            <>
+              <div className="text-center">
+                <div className="text-5xl font-display font-bold text-gradient-blue mb-1">{feedback.overallScore}%</div>
+                <p className="text-gray-500 text-sm">Overall Score</p>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  ['Communication', feedback.communicationScore],
+                  ['Technical', feedback.technicalScore],
+                  ['Problem Solving', feedback.problemSolvingScore],
+                  ['Confidence', feedback.confidenceScore],
+                ].map(([label, score]) => (
+                  <div key={label} className="bg-white/3 rounded-lg p-3 text-center">
+                    <p className="text-lg font-bold text-white">{score}/10</p>
+                    <p className="text-xs text-gray-500 mt-0.5">{label}</p>
+                  </div>
+                ))}
+              </div>
+
+              <p className="text-gray-300 text-sm leading-relaxed bg-white/3 rounded-lg p-4">{feedback.summary}</p>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs font-semibold text-green-400 mb-2 uppercase tracking-wide">Strengths</p>
+                  <ul className="space-y-1.5">
+                    {feedback.strengths?.map((s, i) => <li key={i} className="text-sm text-gray-400 pl-3 border-l-2 border-green-500/30">{s}</li>)}
+                  </ul>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-yellow-400 mb-2 uppercase tracking-wide">Areas to Improve</p>
+                  <ul className="space-y-1.5">
+                    {feedback.weaknesses?.map((w, i) => <li key={i} className="text-sm text-gray-400 pl-3 border-l-2 border-yellow-500/30">{w}</li>)}
+                  </ul>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs font-semibold text-primary-400 mb-2 uppercase tracking-wide">Actionable Tips</p>
+                <ul className="space-y-1.5">
+                  {feedback.actionableTips?.map((t, i) => <li key={i} className="text-sm text-gray-300 flex gap-2"><span className="text-primary-400">→</span>{t}</li>)}
+                </ul>
+              </div>
+            </>
+          )}
         </div>
       )}
 
