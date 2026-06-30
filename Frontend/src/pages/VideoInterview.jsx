@@ -15,6 +15,56 @@ export default function VideoInterview({ onBack }) {
     return () => stopCamera();
   }, []);
 
+  useEffect(() => {
+    if (!loading && status === 'Camera ready') {
+      fetchNextTurn([]);
+    }
+  }, [loading]);
+
+  const speak = (text) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const fetchNextTurn = async (updatedHistory) => {
+    setAiLoading(true);
+    try {
+      const res = await axios.post('/api/interview/video-turn', {
+        role, difficulty, type,
+        history: updatedHistory,
+        turnNumber: updatedHistory.length,
+        totalQuestions
+      });
+      const turn = res.data.turn;
+      setSpokenText(turn.spokenText);
+      setCurrentQuestion(turn.question);
+      setIsLastQuestion(!!turn.isLastQuestion);
+      setTurnNumber(updatedHistory.length);
+      speak(turn.spokenText);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to get next question');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const submitAnswer = () => {
+    if (!answer.trim() || answer.trim().length < 5) return toast.error('Please answer before continuing');
+    const newHistory = [...history, { question: currentQuestion, answer }];
+    setHistory(newHistory);
+    setAnswer('');
+    if (isLastQuestion) {
+      setInterviewEnded(true);
+      window.speechSynthesis.cancel();
+      toast.success('Interview complete!');
+    } else {
+      fetchNextTurn(newHistory);
+    }
+  };
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -70,6 +120,42 @@ export default function VideoInterview({ onBack }) {
           className={`w-full h-full object-cover rounded-xl ${loading ? 'hidden' : ''}`}
         />
       </div>
+
+      {!loading && !interviewEnded && (
+        <div className="card border border-primary-500/15 space-y-3">
+          <div className="flex items-center gap-2">
+            <span className="badge bg-primary-500/15 text-primary-400 text-xs">
+              Question {turnNumber + 1}/{totalQuestions}
+            </span>
+            {aiLoading && <span className="text-xs text-gray-500 flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin" /> Interviewer thinking...</span>}
+          </div>
+          <p className="text-white text-lg leading-relaxed font-medium">
+            {spokenText || 'Loading first question...'}
+          </p>
+
+          <textarea
+            className="input-field min-h-28 resize-none"
+            placeholder="Speak or type your answer here..."
+            value={answer}
+            onChange={e => setAnswer(e.target.value)}
+            disabled={aiLoading}
+          />
+          <button
+            onClick={submitAnswer}
+            disabled={aiLoading || !answer.trim()}
+            className="btn-primary flex items-center gap-2 disabled:opacity-50"
+          >
+            <Send className="w-4 h-4" /> {isLastQuestion ? 'Finish Interview' : 'Submit Answer'}
+          </button>
+        </div>
+      )}
+
+      {interviewEnded && (
+        <div className="card text-center space-y-2">
+          <h2 className="text-xl font-display font-bold text-white">Interview Complete 🎉</h2>
+          <p className="text-gray-400 text-sm">Great job! You answered {history.length} questions.</p>
+        </div>
+      )}
 
       <div className="flex items-center justify-center gap-4">
         <button
