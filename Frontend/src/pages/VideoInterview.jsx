@@ -1,14 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Mic, MicOff, Video, VideoOff, PhoneOff, Loader2 } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, PhoneOff, Loader2, Send } from 'lucide-react';
 
-export default function VideoInterview({ onBack }) {
+export default function VideoInterview({ onBack, role = 'Full Stack Developer', difficulty = 'Medium', type = 'mixed', totalQuestions = 5 }) {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const [camOn, setCamOn] = useState(true);
   const [micOn, setMicOn] = useState(true);
   const [status, setStatus] = useState('Connecting to camera...');
   const [loading, setLoading] = useState(true);
+
+  // AI interviewer state
+  const [history, setHistory] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState('');
+  const [spokenText, setSpokenText] = useState('');
+  const [turnNumber, setTurnNumber] = useState(0);
+  const [answer, setAnswer] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [isLastQuestion, setIsLastQuestion] = useState(false);
+  const [interviewEnded, setInterviewEnded] = useState(false);
 
   useEffect(() => {
     startCamera();
