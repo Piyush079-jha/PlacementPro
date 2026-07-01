@@ -161,57 +161,99 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           boxShadow: 'inset 0 0 120px 30px rgba(0,0,0,0.55)'
         }} />
 
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          {/* Waveform ring avatar */}
-          <div className="relative w-32 h-32 flex items-center justify-center">
-            <svg viewBox="0 0 120 120" className="absolute inset-0 w-full h-full -rotate-90">
-              {[...Array(28)].map((_, i) => {
-                const angle = (i / 28) * 360;
-                const base = 4;
-                const variance = speaking ? base + Math.abs(Math.sin((i * 13) % 7) * 14) : base;
-                return (
-                  <rect
-                    key={i}
-                    x="59"
-                    y={6}
-                    width="2.2"
-                    height={variance}
-                    rx="1.1"
-                    fill={speaking ? '#22d3ee' : '#3730a3'}
-                    opacity={speaking ? 0.9 : 0.35}
-                    style={{
-                      transformOrigin: '60px 60px',
-                      transform: `rotate(${angle}deg)`,
-                      transition: 'height 120ms ease, opacity 300ms ease'
-                    }}
-                  />
-                );
-              })}
-            </svg>
-            <div className={`w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 ${speaking ? 'bg-cyan-400/15 scale-105' : 'bg-indigo-500/15'}`}
-              style={{ boxShadow: speaking ? '0 0 30px rgba(34,211,238,0.35)' : '0 0 20px rgba(99,102,241,0.2)' }}>
-              <span className="text-2xl">🤖</span>
+        {/* Interviewer video panel — looks like a real person on a call */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          {/* Background gradient — feels like a real office/room */}
+          <div className="absolute inset-0" style={{
+            background: 'radial-gradient(ellipse 80% 60% at 50% 40%, #1e2235 0%, #0f111a 60%, #080a10 100%)'
+          }} />
+
+          {/* Human-style avatar — professional silhouette, not a robot */}
+          <div className="relative flex flex-col items-center" style={{ zIndex: 1 }}>
+            <div
+              className="relative"
+              style={{
+                width: 140,
+                height: 140,
+                borderRadius: '50%',
+                boxShadow: speaking
+                  ? '0 0 0 3px #6366f1, 0 0 40px rgba(99,102,241,0.4)'
+                  : '0 0 0 2px rgba(255,255,255,0.08)',
+                transition: 'box-shadow 0.3s ease'
+              }}
+            >
+              {/* Professional avatar illustration */}
+              <svg viewBox="0 0 140 140" width="140" height="140" style={{ borderRadius: '50%', display: 'block' }}>
+                <defs>
+                  <radialGradient id="bg" cx="50%" cy="50%">
+                    <stop offset="0%" stopColor="#1e2644" />
+                    <stop offset="100%" stopColor="#111827" />
+                  </radialGradient>
+                </defs>
+                <circle cx="70" cy="70" r="70" fill="url(#bg)" />
+                {/* Jacket / body */}
+                <ellipse cx="70" cy="130" rx="38" ry="28" fill="#1a2340" />
+                <ellipse cx="70" cy="125" rx="28" ry="22" fill="#1e2a4a" />
+                {/* Shirt / collar */}
+                <polygon points="70,100 62,118 78,118" fill="#f1f5f9" />
+                <polygon points="70,100 58,115 63,118" fill="#e2e8f0" />
+                {/* Neck */}
+                <ellipse cx="70" cy="97" rx="10" ry="8" fill="#c9a882" />
+                {/* Head */}
+                <ellipse cx="70" cy="72" rx="24" ry="26" fill="#d4a76a" />
+                {/* Hair */}
+                <ellipse cx="70" cy="50" rx="24" ry="13" fill="#2d1f0e" />
+                <ellipse cx="70" cy="47" rx="22" ry="10" fill="#3d2a14" />
+                {/* Eyes */}
+                <ellipse cx="62" cy="72" rx="3.5" ry="4" fill="#1a0a00" />
+                <ellipse cx="78" cy="72" rx="3.5" ry="4" fill="#1a0a00" />
+                <ellipse cx="63" cy="71" rx="1.2" ry="1.5" fill="white" opacity="0.7" />
+                <ellipse cx="79" cy="71" rx="1.2" ry="1.5" fill="white" opacity="0.7" />
+                {/* Eyebrows */}
+                <path d="M58 66 Q62 63 66 65" stroke="#2d1f0e" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+                <path d="M74 65 Q78 63 82 66" stroke="#2d1f0e" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+                {/* Nose */}
+                <ellipse cx="70" cy="79" rx="2.5" ry="1.5" fill="#b8894e" />
+                {/* Mouth — subtle smile */}
+                <path d="M64 87 Q70 91 76 87" stroke="#a0714a" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+                {/* Glasses (professional look) */}
+                <rect x="57" y="68" width="12" height="8" rx="3" fill="none" stroke="#374151" strokeWidth="1.3" opacity="0.7" />
+                <rect x="71" y="68" width="12" height="8" rx="3" fill="none" stroke="#374151" strokeWidth="1.3" opacity="0.7" />
+                <line x1="69" y1="72" x2="71" y2="72" stroke="#374151" strokeWidth="1.3" />
+              </svg>
+
+              {/* Speaking pulse ring */}
+              {speaking && (
+                <span className="absolute inset-0 rounded-full border-2 border-indigo-400/50 animate-ping" />
+              )}
             </div>
+
+            {/* Name tag — bottom left like Zoom, not centered */}
           </div>
+        </div>
 
-          <p className="text-white font-display font-semibold mt-4 tracking-tight">AI Interviewer</p>
-          <p className={`text-xs mt-1 font-medium tracking-wide ${speaking ? 'text-cyan-400' : aiLoading ? 'text-indigo-300' : 'text-gray-500'}`}>
-            {aiLoading ? 'THINKING' : speaking ? 'SPEAKING' : 'LISTENING'}
-          </p>
+        {/* Name label — bottom left, Zoom-style */}
+        <div className="absolute bottom-20 left-5" style={{ zIndex: 2 }}>
+          <div className="flex items-center gap-2 bg-black/55 backdrop-blur px-3 py-1.5 rounded-lg">
+            {speaking && <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />}
+            {aiLoading && <Loader2 className="w-3 h-3 animate-spin text-gray-400" />}
+            <span className="text-white text-xs font-medium">Priya Sharma</span>
+            <span className="text-gray-400 text-[10px]">· Technical Interviewer</span>
+          </div>
+        </div>
 
-          {/* Caption */}
-          <div className="absolute bottom-6 left-6 right-6 max-w-2xl mx-auto">
-            <div className="backdrop-blur-xl bg-black/50 rounded-2xl px-5 py-4 border border-white/10 shadow-2xl">
+        {/* Subtitles — bottom center, like live captions */}
+        {(spokenText || aiLoading) && (
+          <div className="absolute bottom-6 left-16 right-6" style={{ zIndex: 2 }}>
+            <div className="backdrop-blur-md bg-black/60 rounded-xl px-4 py-2.5 border border-white/8 max-w-xl">
               {aiLoading ? (
-                <span className="text-gray-400 text-sm flex items-center gap-2">
-                  <Loader2 className="w-4 h-4 animate-spin" /> Preparing next question...
-                </span>
+                <span className="text-gray-500 text-[13px] italic">...</span>
               ) : (
-                <p className="text-gray-100 text-[15px] leading-relaxed">{spokenText || 'Connecting...'}</p>
+                <p className="text-gray-100 text-[13px] leading-snug">{spokenText}</p>
               )}
             </div>
           </div>
-        </div>
+        )}
 
         {/* Self camera */}
         <div className="absolute top-4 right-4 w-36 sm:w-48 aspect-video rounded-xl overflow-hidden border border-white/15 shadow-xl bg-black ring-1 ring-black/40">
