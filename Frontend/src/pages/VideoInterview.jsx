@@ -34,6 +34,19 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const [inputMode, setInputMode] = useState('voice'); // 'voice' | 'text'
   const timerRef = useRef(null);
 
+  // --- Natural inactivity check-ins (no visible countdown) ---
+  const [nudgeText, setNudgeText] = useState('');
+  const lastActivityRef = useRef(Date.now());
+  const nudgeIndexRef = useRef(-1);
+  const NUDGE_LINES = [
+    "Take your time, whenever you're ready.",
+    "No rush — think it through.",
+    "Am I coming through okay?",
+    "Still with me?",
+    "Feel free to think out loud.",
+    "Whenever you're ready, go ahead."
+  ];
+
   useEffect(() => {
     startCamera();
     return () => stopCamera();
@@ -62,6 +75,39 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       window.removeEventListener('offline', goOffline);
     };
   }, []);
+
+  // Reset the "activity clock" whenever the candidate types or speaks
+  useEffect(() => {
+    lastActivityRef.current = Date.now();
+  }, [answer, listening]);
+
+  // Fresh question = fresh start, clear any lingering nudge
+  useEffect(() => {
+    lastActivityRef.current = Date.now();
+    setNudgeText('');
+  }, [currentQuestion]);
+
+  // Natural interviewer check-ins during silence — mimics a real
+  // interviewer noticing you've gone quiet, not a countdown clock
+  useEffect(() => {
+    if (loading || interviewEnded) return;
+    const idleCheck = setInterval(() => {
+      const idleFor = Date.now() - lastActivityRef.current;
+      const shouldNudge = idleFor > 28000 && !speaking && !aiLoading && !answer.trim() && !nudgeText;
+      if (shouldNudge) {
+        let idx;
+        do { idx = Math.floor(Math.random() * NUDGE_LINES.length); }
+        while (idx === nudgeIndexRef.current && NUDGE_LINES.length > 1);
+        nudgeIndexRef.current = idx;
+        const line = NUDGE_LINES[idx];
+        setNudgeText(line);
+        speak(line);
+        lastActivityRef.current = Date.now();
+        setTimeout(() => setNudgeText(''), 4500);
+      }
+    }, 5000);
+    return () => clearInterval(idleCheck);
+  }, [loading, interviewEnded, speaking, aiLoading, answer, nudgeText]);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -341,7 +387,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           </div>
 
           {/* Captions — Google Meet style */}
-          {(spokenText || aiLoading) && (
+          {(spokenText || aiLoading || nudgeText) && (
             <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[92%] max-w-xl" style={{ zIndex: 2 }}>
               <div className="rounded-2xl px-6 py-3.5 text-center"
                 style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -351,6 +397,8 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
                     <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '150ms' }} />
                     <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '300ms' }} />
                   </span>
+                ) : nudgeText ? (
+                  <p className="text-indigo-300 italic font-medium leading-relaxed" style={{ fontSize: '16px' }}>{nudgeText}</p>
                 ) : (
                   <p className="text-gray-100 font-semibold leading-relaxed" style={{ fontSize: '18px' }}>{spokenText}</p>
                 )}
