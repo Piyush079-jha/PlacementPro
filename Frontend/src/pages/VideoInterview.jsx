@@ -93,7 +93,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     if (loading || interviewEnded) return;
     const idleCheck = setInterval(() => {
       const idleFor = Date.now() - lastActivityRef.current;
-      const shouldNudge = idleFor > 28000 && !speaking && !aiLoading && !answer.trim() && !nudgeText;
+      const shouldNudge = idleFor > 10000 && !speaking && !aiLoading && !answer.trim() && !nudgeText;
       if (shouldNudge) {
         let idx;
         do { idx = Math.floor(Math.random() * NUDGE_LINES.length); }
