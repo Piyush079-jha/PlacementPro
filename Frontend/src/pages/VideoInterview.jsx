@@ -56,13 +56,13 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     if (!loading && status === 'Camera ready') fetchNextTurn([]);
   }, [loading]);
 
-  // Timer — starts once camera is ready, stops when interview ends
+  // Timer — starts only once the first question has actually been asked
   useEffect(() => {
-    if (!loading && !interviewEnded) {
+    if (!loading && !interviewEnded && currentQuestion) {
       timerRef.current = setInterval(() => setElapsedSeconds(s => s + 1), 1000);
     }
     return () => clearInterval(timerRef.current);
-  }, [loading, interviewEnded]);
+  }, [loading, interviewEnded, currentQuestion]);
 
   // Network indicator
   useEffect(() => {
@@ -87,10 +87,9 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     setNudgeText('');
   }, [currentQuestion]);
 
-  // Natural interviewer check-ins during silence — mimics a real
-  // interviewer noticing you've gone quiet, not a countdown clock
+
   useEffect(() => {
-    if (loading || interviewEnded) return;
+    if (loading || interviewEnded || feedbackLoading) return;
     const idleCheck = setInterval(() => {
       const idleFor = Date.now() - lastActivityRef.current;
       const shouldNudge = idleFor > 10000 && !speaking && !aiLoading && !answer.trim() && !nudgeText;
@@ -107,7 +106,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       }
     }, 5000);
     return () => clearInterval(idleCheck);
-  }, [loading, interviewEnded, speaking, aiLoading, answer, nudgeText]);
+  }, [loading, interviewEnded, feedbackLoading, speaking, aiLoading, answer, nudgeText]);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -165,10 +164,18 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     if (track) { track.enabled = !track.enabled; setMicOn(track.enabled); }
   };
 
-  const endCall = () => { stopCamera(); onBack(); };
+  const endCall = () => {
+    if (!interviewEnded && currentQuestion) {
+      const confirmLeave = window.confirm('Leave the interview now? Your progress will not be saved and this cannot be resumed.');
+      if (!confirmLeave) return;
+    }
+    window.speechSynthesis.cancel();
+    stopCamera();
+    onBack();
+  };
 
   const speak = (text) => {
-    if (!('speechSynthesis' in window)) return;
+    if (!('speechSynthesis' in window) || interviewEnded) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1;
@@ -428,11 +435,23 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
                 <Loader2 className="w-5 h-5 animate-spin" />
               </div>
             )}
-            <video ref={videoRef} autoPlay muted playsInline className={`w-full h-full object-cover ${loading ? 'hidden' : ''}`} />
-            <span className="absolute bottom-1.5 left-1.5 text-[10px] text-white/90 bg-black/50 backdrop-blur px-2 py-0.5 rounded-full">You</span>
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              playsInline
+              width={220}
+              height={124}
+              className={`w-full h-full object-cover ${loading || !camOn ? 'hidden' : ''}`}
+            />
+            <span className="absolute bottom-1.5 left-1.5 text-[10px] text-white/90 bg-black/50 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-1">
+              You
+              {listening && <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />}
+            </span>
             {!camOn && !loading && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/60">
-                <VideoOff className="w-5 h-5 text-gray-400" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 gap-1.5">
+                <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-xs font-semibold text-gray-300">You</div>
+                <VideoOff className="w-4 h-4 text-gray-500" />
               </div>
             )}
           </div>
@@ -537,10 +556,11 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
 
             <button
               onClick={submitAnswer}
-              disabled={aiLoading || !answer.trim()}
+              disabled={aiLoading || listening || !answer.trim()}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-semibold disabled:opacity-40 hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg shadow-indigo-500/20 focus:outline-none focus:ring-2 focus:ring-indigo-400/60"
             >
-              <Send className="w-4 h-4" /> {isLastQuestion ? 'Finish Interview' : 'Submit Answer'}
+              <Send className="w-4 h-4" />
+              {listening ? 'Finish speaking first' : isLastQuestion ? 'Finish Interview' : 'Submit Answer'}
             </button>
           </div>
         )}
