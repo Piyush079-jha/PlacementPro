@@ -108,7 +108,7 @@ Respond with valid JSON only.`;
 
     const userMessage = isFirstTurn
       ? `Start a live ${difficulty || 'Medium'} difficulty ${type || 'mixed'} interview for a ${role} position.
-${displayName ? `The candidate's name is ${displayName} — greet them by name ONCE in this opening greeting, naturally, the way a real interviewer would (e.g. "Hi ${displayName}, thanks for joining" — not a stiff "Hello ${displayName}."). Do not use their name again after this greeting.` : `Greet the candidate warmly and professionally.`}
+${displayName ? `The candidate's name is ${displayName} — greet them by name ONCE in this opening greeting, naturally, the way a real interviewer would (e.g. "Hi ${displayName}, thanks for joining"). Do not use their name again after this greeting.` : `Greet the candidate warmly and professionally WITHOUT using any name. Do NOT invent, guess, or use a placeholder/example name like "Rohan", "Priya", or "Amit" for the candidate under any circumstances — just say something like "Hi there" or skip the name entirely.`}
 This is the opening of the interview — ease the candidate in like a real interviewer would. Then ask a light, easy opening question (e.g. "tell me about yourself", a quick icebreaker about their background/experience, or a simple intro-level question). Do NOT start with a hard technical or DSA question — save depth for later turns once the candidate is warmed up.
 
 Return JSON:
