@@ -87,8 +87,18 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   }, []);
 
   useEffect(() => {
-    if (!loading && status === 'Camera ready') fetchNextTurn([]);
-  }, [loading]);
+    if (loading || status !== 'Camera ready' || greetedRef.current) return;
+    greetedRef.current = true;
+
+    const greeting = `Hi ${candidateName}, welcome! I'm Priya, and I'll be conducting your interview today for the ${role} position. This will be a ${difficulty.toLowerCase()} level, ${type === 'mixed' ? 'mixed' : type} round with a few questions — just answer naturally, there's no rush. Let's get started.`;
+    setSpokenText(greeting);
+    speak(greeting);
+
+    // Give the greeting time to actually finish before the first question lands
+    const estimatedMs = Math.max(3500, greeting.length * 55);
+    const t = setTimeout(() => fetchNextTurn([]), estimatedMs);
+    return () => clearTimeout(t);
+  }, [loading, status]);
 
   // Timer — starts only once the first question has actually been asked
   useEffect(() => {
