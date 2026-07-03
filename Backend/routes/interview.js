@@ -80,9 +80,11 @@ Return JSON:
 // which is what makes the video mode feel like a real, responsive interviewer.
 router.post('/video-turn', auth, async (req, res) => {
   try {
-    const { role, difficulty, type, history = [], turnNumber, totalQuestions } = req.body;
+    const { role, difficulty, type, history = [], turnNumber, totalQuestions, candidateName } = req.body;
     if (!role) return res.status(400).json({ error: 'Role is required' });
     if (!totalQuestions) return res.status(400).json({ error: 'totalQuestions is required' });
+
+    const displayName = (candidateName && candidateName.trim()) ? candidateName.trim() : null;
 
     const isFirstTurn = turnNumber === 0 || history.length === 0;
     const isFinalTurn = turnNumber >= totalQuestions - 1;
@@ -96,6 +98,8 @@ Adapt your next question based on the DEPTH and QUALITY of the candidate's last 
 While generating each turn, silently assess (for internal scoring) the candidate's communication clarity, technical depth, problem-solving approach, and confidence — this will be used for final feedback, but do not say scores aloud during the interview.
 Keep your spoken text concise (2-4 sentences max) since it will be read aloud by text-to-speech.
 Always generate fresh, varied questions — avoid generic or repeated questions across sessions, and avoid overlapping topics within the same interview.
+If you're given the candidate's name, use it ONLY in the opening greeting — real interviewers don't repeat a candidate's name before every sentence, it feels scripted. Do not use the name again in later turns unless naturally re-engaging attention (e.g. candidate seemed to stall).
+Vary HOW you acknowledge answers turn to turn — don't open every response the same way (e.g. don't always start with "Great answer" or "Good job"). Sometimes acknowledge briefly and move on, sometimes ask a genuine follow-up on something specific they said, sometimes just transition naturally without an explicit compliment — mirror how a real interviewer's reactions differ based on what was actually said.
 Respond with valid JSON only.`;
 
     const historyText = history.map((h, i) =>
@@ -104,7 +108,8 @@ Respond with valid JSON only.`;
 
     const userMessage = isFirstTurn
       ? `Start a live ${difficulty || 'Medium'} difficulty ${type || 'mixed'} interview for a ${role} position.
-This is the opening of the interview — ease the candidate in like a real interviewer would. Greet them warmly and professionally, then ask a light, easy opening question (e.g. "tell me about yourself", a quick icebreaker about their background/experience, or a simple intro-level question). Do NOT start with a hard technical or DSA question — save depth for later turns once the candidate is warmed up.
+${displayName ? `The candidate's name is ${displayName} — greet them by name ONCE in this opening greeting, naturally, the way a real interviewer would (e.g. "Hi ${displayName}, thanks for joining" — not a stiff "Hello ${displayName}."). Do not use their name again after this greeting.` : `Greet the candidate warmly and professionally.`}
+This is the opening of the interview — ease the candidate in like a real interviewer would. Then ask a light, easy opening question (e.g. "tell me about yourself", a quick icebreaker about their background/experience, or a simple intro-level question). Do NOT start with a hard technical or DSA question — save depth for later turns once the candidate is warmed up.
 
 Return JSON:
 {
@@ -143,15 +148,17 @@ Return JSON:
 // Generate comprehensive final feedback for a completed video interview
 router.post('/video-summary', auth, async (req, res) => {
   try {
-    const { role, difficulty, history = [] } = req.body;
+    const { role, difficulty, history = [], candidateName } = req.body;
     if (!history.length) return res.status(400).json({ error: 'No interview history provided' });
+
+    const displayName = (candidateName && candidateName.trim()) ? candidateName.trim() : null;
 
     const systemPrompt = `You are a senior technical interviewer providing a final, honest performance review after a live interview.
 Be specific, constructive, and actionable — like real interview feedback a candidate would get from a hiring manager. Respond with valid JSON only.`;
 
     const transcript = history.map((h, i) => `Q${i + 1}: ${h.question}\nAnswer: ${h.answer}`).join('\n\n');
 
-    const userMessage = `Review this full interview transcript for a ${role} position (${difficulty || 'Medium'} difficulty):
+    const userMessage = `Review this full interview transcript for ${displayName ? `${displayName}, a candidate` : 'a candidate'} applying for a ${role} position (${difficulty || 'Medium'} difficulty):
 
 ${transcript}
 

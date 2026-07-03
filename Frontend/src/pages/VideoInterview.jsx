@@ -63,20 +63,20 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
 
 
   const STAGE_1_LINES = [
-    "Take your time, whenever you're ready.",
-    "No rush — think it through.",
-    "Whenever you're ready, go ahead."
+    "Take your time.",
+    "No rush, think it through.",
+    "Go ahead whenever you're ready."
   ];
- 
+
   const STAGE_2_LINES = [
-    "Would it help if I rephrased the question?",
-    "Feel free to think out loud, even a rough answer is fine.",
-    "Are you still there? Take a moment if you need it."
+    "Want me to rephrase that?",
+    "Even a rough answer is fine — just think out loud.",
+    `${candidateName}, you still there?`
   ];
-  
+
   const STAGE_3_LINES = [
-    `It's okay if you're not sure, ${candidateName} — would you like to skip this one and move to the next question?`,
-    "No worries if this one's tricky. Want to move on and come back to it later?"
+    `That's alright, ${candidateName} — let's skip this one and come back to it if there's time.`,
+    "No worries, let's move on to the next question."
   ];
 
   useEffect(() => {
@@ -87,15 +87,10 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   useEffect(() => {
     if (loading || status !== 'Camera ready' || greetedRef.current) return;
     greetedRef.current = true;
-
-    const greeting = `Hi ${candidateName}, welcome! I'm Priya, and I'll be conducting your interview today for the ${role} position. This will be a ${difficulty.toLowerCase()} level, ${type === 'mixed' ? 'mixed' : type} round with a few questions — just answer naturally, there's no rush. Let's get started.`;
-    setSpokenText(greeting);
-    speak(greeting);
-
-    // Give the greeting time to actually finish before the first question lands
-    const estimatedMs = Math.max(3500, greeting.length * 55);
-    const t = setTimeout(() => fetchNextTurn([]), estimatedMs);
-    return () => clearTimeout(t);
+    // Backend owns the single greeting + first question now (candidateName is
+    // already sent in the request body below) — no client-side pre-greeting,
+    // so Priya only introduces herself once, like a real interviewer would.
+    fetchNextTurn([]);
   }, [loading, status]);
 
   // Timer — starts only once the first question has actually been asked
