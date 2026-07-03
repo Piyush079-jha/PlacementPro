@@ -469,7 +469,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           </div>
 
           {/* Bottom controls — centered, Meet-style */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3">
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3" style={{ zIndex: 3 }}>
             <button
               onClick={toggleMic}
               aria-label={micOn ? 'Mute microphone' : 'Unmute microphone'}
