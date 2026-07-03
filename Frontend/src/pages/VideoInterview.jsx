@@ -6,7 +6,27 @@ import {
   Settings, Wifi, Circle, Pencil, Sparkles
 } from 'lucide-react';
 
-export default function VideoInterview({ onBack, role = 'Full Stack Developer', difficulty = 'Medium', type = 'mixed', totalQuestions = 5 }) {
+export default function VideoInterview({ onBack, role = 'Full Stack Developer', difficulty = 'Medium', type = 'mixed', totalQuestions = 5, candidateName: candidateNameProp }) {
+  // Resolve logged-in candidate's first name — adjust the localStorage keys
+  // below to match whatever your AuthContext actually stores.
+  const resolveCandidateName = (explicitName) => {
+    if (explicitName && explicitName.trim()) return explicitName.trim().split(' ')[0];
+    try {
+      const rawUser = localStorage.getItem('user');
+      if (rawUser) {
+        const parsed = JSON.parse(rawUser);
+        const n = parsed?.name || parsed?.fullName || parsed?.username;
+        if (n) return String(n).trim().split(' ')[0];
+      }
+    } catch {}
+    try {
+      const storedName = localStorage.getItem('name');
+      if (storedName) return storedName.trim().split(' ')[0];
+    } catch {}
+    return 'there';
+  };
+  const [candidateName] = useState(() => resolveCandidateName(candidateNameProp));
+
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const [camOn, setCamOn] = useState(true);
