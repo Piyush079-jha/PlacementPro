@@ -34,17 +34,29 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const [inputMode, setInputMode] = useState('voice'); // 'voice' | 'text'
   const timerRef = useRef(null);
 
-  // --- Natural inactivity check-ins (no visible countdown) ---
+  // --- Natural inactivity check-ins (escalating, non-repetitive) ---
   const [nudgeText, setNudgeText] = useState('');
   const lastActivityRef = useRef(Date.now());
   const nudgeIndexRef = useRef(-1);
-  const NUDGE_LINES = [
+  const nudgeStageRef = useRef(0); // 0 = none yet, 1 = gentle, 2 = re-engage, 3 = offer to move on
+  const usedLinesRef = useRef(new Set());
+
+  // Stage 1 (first ~10s of silence): gentle, low-pressure
+  const STAGE_1_LINES = [
     "Take your time, whenever you're ready.",
     "No rush — think it through.",
-    "Am I coming through okay?",
-    "Still with me?",
-    "Feel free to think out loud.",
     "Whenever you're ready, go ahead."
+  ];
+  // Stage 2 (~25s of silence): actively re-engage, check if they're stuck
+  const STAGE_2_LINES = [
+    "Would it help if I rephrased the question?",
+    "Feel free to think out loud, even a rough answer is fine.",
+    "Are you still there? Take a moment if you need it."
+  ];
+  // Stage 3 (~45s of silence): acknowledge the stall directly, offer to move on
+  const STAGE_3_LINES = [
+    "It's okay if you're not sure — would you like to skip this one and move to the next question?",
+    "No worries if this one's tricky. Want to move on and come back to it later?"
   ];
 
   useEffect(() => {
