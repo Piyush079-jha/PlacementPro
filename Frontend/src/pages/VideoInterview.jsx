@@ -47,6 +47,8 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const [feedback, setFeedback] = useState(null);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const recognitionRef = useRef(null);
+  const greetedRef = useRef(false);
+  const nameUsedInNudgeRef = useRef(false); 
 
   // --- UI-only additions (no business logic touched) ---
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
