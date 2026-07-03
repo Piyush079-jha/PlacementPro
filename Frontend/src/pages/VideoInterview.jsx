@@ -152,16 +152,28 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     }
   };
 
-  const stopCamera = () => streamRef.current?.getTracks().forEach(t => t.stop());
+  const stopCamera = () => {
+    try {
+      streamRef.current?.getTracks().forEach(t => t.stop());
+    } catch (err) {
+      console.error('Error stopping camera:', err);
+    } finally {
+      streamRef.current = null;
+    }
+  };
 
   const toggleCam = () => {
     const track = streamRef.current?.getVideoTracks()[0];
-    if (track) { track.enabled = !track.enabled; setCamOn(track.enabled); }
+    if (!track) return toast.error('Camera not available');
+    track.enabled = !track.enabled;
+    setCamOn(track.enabled);
   };
 
   const toggleMic = () => {
     const track = streamRef.current?.getAudioTracks()[0];
-    if (track) { track.enabled = !track.enabled; setMicOn(track.enabled); }
+    if (!track) return toast.error('Microphone not available');
+    track.enabled = !track.enabled;
+    setMicOn(track.enabled);
   };
 
   const endCall = () => {
@@ -482,6 +494,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
               <PhoneOff className="w-4.5 h-4.5" />
             </button>
             <button
+              onClick={() => toast('Device settings coming soon', { icon: '⚙️' })}
               aria-label="Settings"
               className="w-11 h-11 rounded-full flex items-center justify-center border border-white/15 bg-white/5 text-gray-300 hover:border-indigo-400/40 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400/60"
               style={{ backdropFilter: 'blur(12px)' }}
