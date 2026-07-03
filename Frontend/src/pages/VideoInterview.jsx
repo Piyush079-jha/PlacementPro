@@ -93,10 +93,13 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     lastActivityRef.current = Date.now();
   }, [answer, listening]);
 
-  // Fresh question = fresh start, clear any lingering nudge
+  // Fresh question = fresh start, clear any lingering nudge and reset escalation
   useEffect(() => {
     lastActivityRef.current = Date.now();
     setNudgeText('');
+    nudgeStageRef.current = 0;
+    nudgeIndexRef.current = -1;
+    usedLinesRef.current = new Set();
   }, [currentQuestion]);
 
 
