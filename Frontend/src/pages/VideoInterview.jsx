@@ -317,7 +317,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           <div className="pointer-events-none absolute inset-0" style={{ boxShadow: 'inset 0 0 140px 30px rgba(0,0,0,0.55)' }} />
 
           {/* Interviewer — large, centered, premium */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-4" style={{ zIndex: 1 }}>
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pointer-events-none" style={{ zIndex: 1 }}>
             <div
               className="relative"
               style={{
