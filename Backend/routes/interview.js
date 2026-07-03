@@ -108,7 +108,7 @@ Respond with valid JSON only.`;
 
     const userMessage = isFirstTurn
       ? `Start a live ${difficulty || 'Medium'} difficulty ${type || 'mixed'} interview for a ${role} position.
-${displayName ? `The candidate's name is ${displayName} — greet them by name ONCE in this opening greeting, naturally, the way a real interviewer would (e.g. "Hi ${displayName}, thanks for joining"). Do not use their name again after this greeting.` : `Greet the candidate warmly and professionally WITHOUT using any name. Do NOT invent, guess, or use a placeholder/example name like "Rohan", "Priya", or "Amit" for the candidate under any circumstances — just say something like "Hi there" or skip the name entirely.`}
+${displayName ? `Greet the candidate by name: start with "Hi ${displayName}," exactly, then continue warmly. Use their name ONCE only, in this greeting.` : `Greet the candidate warmly using "Hi there," — do not use any other name.`}
 This is the opening of the interview — ease the candidate in like a real interviewer would. Then ask a light, easy opening question (e.g. "tell me about yourself", a quick icebreaker about their background/experience, or a simple intro-level question). Do NOT start with a hard technical or DSA question — save depth for later turns once the candidate is warmed up.
 
 Return JSON:
@@ -138,6 +138,23 @@ Return JSON:
     const result = await callClaude(systemPrompt, userMessage, 600);
     const turn = parseJSON(result);
     if (!turn) return res.status(500).json({ error: 'Failed to generate next turn. Please try again.' });
+
+    // Safety net: if a name was expected but the model produced a different one
+    // (or invented one when none was given), correct it rather than trust the model blindly.
+    if (isFirstTurn && turn.spokenText) {
+      const commonFakeNames = ['Rohan', 'Priya', 'Amit', 'Rahul', 'Sneha', 'Anjali', 'Vikram'];
+      if (displayName) {
+        for (const fake of commonFakeNames) {
+          if (fake !== displayName && turn.spokenText.includes(fake)) {
+            turn.spokenText = turn.spokenText.replace(new RegExp(fake, 'g'), displayName);
+          }
+        }
+      } else {
+        for (const fake of commonFakeNames) {
+          turn.spokenText = turn.spokenText.replace(new RegExp(`\\b${fake}\\b,?\\s*`, 'g'), '');
+        }
+      }
+    }
 
     res.json({ success: true, turn });
   } catch (err) {
