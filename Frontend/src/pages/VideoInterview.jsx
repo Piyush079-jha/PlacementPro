@@ -103,17 +103,53 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   }, [currentQuestion]);
 
 
+  const pickUnusedLine = (pool) => {
+    const unused = pool.filter(l => !usedLinesRef.current.has(l));
+    const source = unused.length > 0 ? unused : pool; // if all used, allow reuse rather than break
+    const line = source[Math.floor(Math.random() * source.length)];
+    usedLinesRef.current.add(line);
+    return line;
+  };
+
   useEffect(() => {
     if (loading || interviewEnded || feedbackLoading) return;
     const idleCheck = setInterval(() => {
       const idleFor = Date.now() - lastActivityRef.current;
-      const shouldNudge = idleFor > 10000 && !speaking && !aiLoading && !answer.trim() && !nudgeText;
-      if (shouldNudge) {
-        let idx;
-        do { idx = Math.floor(Math.random() * NUDGE_LINES.length); }
-        while (idx === nudgeIndexRef.current && NUDGE_LINES.length > 1);
-        nudgeIndexRef.current = idx;
-        const line = NUDGE_LINES[idx];
+      const isIdle = !speaking && !aiLoading && !answer.trim() && !nudgeText && !listening;
+      if (!isIdle) return;
+
+      // Stage progression based on total silence, not repeated fixed intervals
+      if (idleFor > 45000 && nudgeStageRef.current >= 2) {
+        // Stage 3 — offer to move on, then actually skip the question
+        nudgeStageRef.current = 3;
+        const line = pickUnusedLine(STAGE_3_LINES);
+        setNudgeText(line);
+        speak(line);
+        lastActivityRef.current = Date.now();
+        setTimeout(() => {
+          setNudgeText('');
+          if (!answer.trim()) {
+            const newHistory = [...history, { question: currentQuestion, answer: '(No response — candidate chose to skip)' }];
+            setHistory(newHistory);
+            setAnswer('');
+            if (isLastQuestion) {
+              setInterviewEnded(true);
+              window.speechSynthesis.cancel();
+            } else {
+              fetchNextTurn(newHistory);
+            }
+          }
+        }, 5000);
+      } else if (idleFor > 25000 && nudgeStageRef.current >= 1) {
+        nudgeStageRef.current = 2;
+        const line = pickUnusedLine(STAGE_2_LINES);
+        setNudgeText(line);
+        speak(line);
+        lastActivityRef.current = Date.now();
+        setTimeout(() => setNudgeText(''), 4500);
+      } else if (idleFor > 10000 && nudgeStageRef.current === 0) {
+        nudgeStageRef.current = 1;
+        const line = pickUnusedLine(STAGE_1_LINES);
         setNudgeText(line);
         speak(line);
         lastActivityRef.current = Date.now();
@@ -121,7 +157,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       }
     }, 5000);
     return () => clearInterval(idleCheck);
-  }, [loading, interviewEnded, feedbackLoading, speaking, aiLoading, answer, nudgeText]);
+  }, [loading, interviewEnded, feedbackLoading, speaking, aiLoading, answer, nudgeText, listening, history, currentQuestion, isLastQuestion]);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
