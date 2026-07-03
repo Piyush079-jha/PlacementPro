@@ -50,34 +50,32 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const greetedRef = useRef(false);
   const nameUsedInNudgeRef = useRef(false); 
 
-  // --- UI-only additions (no business logic touched) ---
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
-  const [inputMode, setInputMode] = useState('voice'); // 'voice' | 'text'
+  const [inputMode, setInputMode] = useState('voice'); 
   const timerRef = useRef(null);
 
-  // --- Natural inactivity check-ins (escalating, non-repetitive) ---
   const [nudgeText, setNudgeText] = useState('');
   const lastActivityRef = useRef(Date.now());
   const nudgeIndexRef = useRef(-1);
-  const nudgeStageRef = useRef(0); // 0 = none yet, 1 = gentle, 2 = re-engage, 3 = offer to move on
+  const nudgeStageRef = useRef(0); 
   const usedLinesRef = useRef(new Set());
 
-  // Stage 1 (first ~10s of silence): gentle, low-pressure
+
   const STAGE_1_LINES = [
     "Take your time, whenever you're ready.",
     "No rush — think it through.",
     "Whenever you're ready, go ahead."
   ];
-  // Stage 2 (~25s of silence): actively re-engage, check if they're stuck
+ 
   const STAGE_2_LINES = [
     "Would it help if I rephrased the question?",
     "Feel free to think out loud, even a rough answer is fine.",
     "Are you still there? Take a moment if you need it."
   ];
-  // Stage 3 (~45s of silence): acknowledge the stall directly, offer to move on
+  
   const STAGE_3_LINES = [
-    "It's okay if you're not sure — would you like to skip this one and move to the next question?",
+    `It's okay if you're not sure, ${candidateName} — would you like to skip this one and move to the next question?`,
     "No worries if this one's tricky. Want to move on and come back to it later?"
   ];
 
@@ -285,7 +283,8 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     try {
       const res = await axios.post('/api/interview/video-turn', {
         role, difficulty, type, history: updatedHistory,
-        turnNumber: updatedHistory.length, totalQuestions
+        turnNumber: updatedHistory.length, totalQuestions,
+        candidateName
       });
       const turn = res.data.turn;
       setSpokenText(turn.spokenText);
@@ -311,7 +310,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       window.speechSynthesis.cancel();
       setFeedbackLoading(true);
       try {
-        const res = await axios.post('/api/interview/video-summary', { role, difficulty, history: newHistory });
+        const res = await axios.post('/api/interview/video-summary', { role, difficulty, history: newHistory, candidateName });
         setFeedback(res.data.feedback);
       } catch {
         toast.error('Failed to generate final feedback');
@@ -666,7 +665,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           <div className="rounded-2xl p-6 space-y-5"
             style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white tracking-tight">Interview Complete</h2>
+              <h2 className="text-2xl font-bold text-white tracking-tight">Great effort, {candidateName}!</h2>
               <p className="text-gray-500 text-sm mt-1">Here's your detailed performance review</p>
             </div>
 
