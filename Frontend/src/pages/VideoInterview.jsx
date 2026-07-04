@@ -705,6 +705,60 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           </div>
         )}
 
+        {/* ===== Device Settings Modal ===== */}
+        {showSettings && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4"
+            onClick={() => setShowSettings(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-2xl p-6 space-y-5"
+              style={{ background: '#13152680%', backgroundColor: 'rgba(19,17,38,0.97)', border: '1px solid rgba(255,255,255,0.1)' }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="text-white font-semibold text-base">Device Settings</h3>
+                <button onClick={() => setShowSettings(false)} className="text-gray-500 hover:text-gray-300 text-sm">✕</button>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs text-gray-400 uppercase tracking-wide">Camera</label>
+                <select
+                  value={selectedVideoId}
+                  onChange={(e) => switchDevice('video', e.target.value)}
+                  className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-indigo-400/40"
+                >
+                  {videoDevices.length === 0 && <option value="">No cameras found</option>}
+                  {videoDevices.map(d => (
+                    <option key={d.deviceId} value={d.deviceId}>{d.label || 'Camera'}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs text-gray-400 uppercase tracking-wide">Microphone</label>
+                <select
+                  value={selectedAudioId}
+                  onChange={(e) => switchDevice('audio', e.target.value)}
+                  className="w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-indigo-400/40"
+                >
+                  {audioDevices.length === 0 && <option value="">No microphones found</option>}
+                  {audioDevices.map(d => (
+                    <option key={d.deviceId} value={d.deviceId}>{d.label || 'Microphone'}</option>
+                  ))}
+                </select>
+              </div>
+
+              <button
+                onClick={() => setShowSettings(false)}
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-semibold hover:opacity-90 transition-all"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* ===== Feedback ===== */}
         {interviewEnded && (
           <div className="rounded-2xl p-6 space-y-5"
