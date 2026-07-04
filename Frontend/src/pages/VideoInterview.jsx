@@ -621,7 +621,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
               <PhoneOff className="w-4.5 h-4.5" />
             </button>
             <button
-              onClick={() => toast('Device settings coming soon', { icon: '⚙️' })}
+              onClick={openSettings}
               aria-label="Settings"
               className="w-11 h-11 rounded-full flex items-center justify-center border border-white/15 bg-white/5 text-gray-300 hover:border-indigo-400/40 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400/60"
               style={{ backdropFilter: 'blur(12px)' }}
