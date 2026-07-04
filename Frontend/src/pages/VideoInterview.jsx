@@ -61,6 +61,15 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const nudgeStageRef = useRef(0); 
   const usedLinesRef = useRef(new Set());
 
+  // --- Device settings (camera/mic selection) ---
+  const [showSettings, setShowSettings] = useState(false);
+  const [videoDevices, setVideoDevices] = useState([]);
+  const [audioDevices, setAudioDevices] = useState([]);
+  const [selectedVideoId, setSelectedVideoId] = useState('');
+  const [selectedAudioId, setSelectedAudioId] = useState('');
+
+
+
 
   const STAGE_1_LINES = [
     "Take your time.",
