@@ -23,7 +23,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       const storedName = localStorage.getItem('name');
       if (storedName) return storedName.trim().split(' ')[0];
     } catch {}
-    return 'there';
+    return null; 
   };
   const [candidateName] = useState(() => resolveCandidateName(candidateNameProp));
 
@@ -660,7 +660,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           <div className="rounded-2xl p-6 space-y-5"
             style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }}>
             <div className="text-center">
-              <h2 className="text-2xl font-bold text-white tracking-tight">Great effort, {candidateName}!</h2>
+              <h2 className="text-2xl font-bold text-white tracking-tight">Great effort{candidateName ? `, ${candidateName}` : ''}!</h2>
               <p className="text-gray-500 text-sm mt-1">Here's your detailed performance review</p>
             </div>
 
