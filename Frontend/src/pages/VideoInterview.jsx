@@ -247,6 +247,47 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     }
   };
 
+  const loadDevices = async () => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      setVideoDevices(devices.filter(d => d.kind === 'videoinput'));
+      setAudioDevices(devices.filter(d => d.kind === 'audioinput'));
+      const currentVideoTrack = streamRef.current?.getVideoTracks()[0];
+      const currentAudioTrack = streamRef.current?.getAudioTracks()[0];
+      if (currentVideoTrack) setSelectedVideoId(currentVideoTrack.getSettings().deviceId || '');
+      if (currentAudioTrack) setSelectedAudioId(currentAudioTrack.getSettings().deviceId || '');
+    } catch {
+      toast.error('Could not list devices');
+    }
+  };
+
+  const openSettings = async () => {
+    await loadDevices();
+    setShowSettings(true);
+  };
+
+  const switchDevice = async (kind, deviceId) => {
+    try {
+      const constraints = {
+        video: kind === 'video' ? { deviceId: { exact: deviceId } } : (streamRef.current?.getVideoTracks()[0] ? { deviceId: { exact: selectedVideoId } } : true),
+        audio: kind === 'audio' ? { deviceId: { exact: deviceId } } : (streamRef.current?.getAudioTracks()[0] ? { deviceId: { exact: selectedAudioId } } : true)
+      };
+      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+      // Stop old tracks only after the new stream succeeds, so a failed switch doesn't kill the current feed
+      streamRef.current?.getTracks().forEach(t => t.stop());
+      streamRef.current = newStream;
+      if (videoRef.current) videoRef.current.srcObject = newStream;
+      // Respect current mute state on the new tracks
+      newStream.getVideoTracks().forEach(t => t.enabled = camOn);
+      newStream.getAudioTracks().forEach(t => t.enabled = micOn);
+      if (kind === 'video') setSelectedVideoId(deviceId);
+      else setSelectedAudioId(deviceId);
+      toast.success(`Switched ${kind === 'video' ? 'camera' : 'microphone'}`);
+    } catch {
+      toast.error(`Could not switch ${kind === 'video' ? 'camera' : 'microphone'}`);
+    }
+  };
+
   const toggleCam = () => {
     const track = streamRef.current?.getVideoTracks()[0];
     if (!track) return toast.error('Camera not available');
