@@ -443,160 +443,114 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           }}>
           <div className="pointer-events-none absolute inset-0" style={{ boxShadow: 'inset 0 0 140px 30px rgba(0,0,0,0.55)' }} />
 
-          {/* Interviewer — large, centered, premium */}
-          <div className="absolute inset-0 flex flex-col items-center justify-center px-4 pointer-events-none" style={{ zIndex: 1 }}>
-            <div
-              className="relative"
+          {/* ── Side-by-side tiles: Interviewer (left) | Candidate (right) ── */}
+          <div className="absolute inset-0 flex items-stretch gap-2 p-3" style={{ zIndex: 1 }}>
+
+            {/* LEFT — Interviewer tile */}
+            <div className="flex-1 rounded-2xl relative overflow-hidden flex flex-col items-center justify-center"
               style={{
-                borderRadius: '50%',
-                padding: 6,
-                background: speaking
-                  ? 'conic-gradient(from 0deg, #6366f1, #22d3ee, #a855f7, #6366f1)'
-                  : 'linear-gradient(135deg, rgba(99,102,241,0.35), rgba(255,255,255,0.06))',
-                boxShadow: speaking ? '0 0 70px rgba(99,102,241,0.55)' : '0 0 40px rgba(99,102,241,0.15)',
-                transition: 'all 0.5s ease',
-                animation: 'floaty 6s ease-in-out infinite'
-              }}
-            >
-              <div
-                style={{
-                  borderRadius: '50%', overflow: 'hidden', width: 200, height: 200, background: '#1a2035',
-                  transform: speaking ? 'scale(1.03)' : 'scale(1)', transition: 'transform 0.4s ease'
-                }}
-              >
-                <svg viewBox="0 0 160 160" width="200" height="200">
-                  <defs>
-                    <radialGradient id="roomBg" cx="50%" cy="30%">
-                      <stop offset="0%" stopColor="#2a3050" />
-                      <stop offset="100%" stopColor="#141825" />
-                    </radialGradient>
-                    <radialGradient id="skinTone" cx="50%" cy="40%">
-                      <stop offset="0%" stopColor="#e8b88a" />
-                      <stop offset="100%" stopColor="#c89060" />
-                    </radialGradient>
-                  </defs>
-                  <rect width="160" height="160" fill="url(#roomBg)" />
-                  <rect x="0" y="30" width="20" height="80" fill="#1a2030" opacity="0.6" />
-                  <rect x="2" y="35" width="16" height="4" rx="1" fill="#4a3060" opacity="0.5" />
-                  <rect x="2" y="42" width="16" height="4" rx="1" fill="#304060" opacity="0.5" />
-                  <rect x="2" y="49" width="16" height="4" rx="1" fill="#604030" opacity="0.5" />
-                  <ellipse cx="80" cy="90" rx="55" ry="30" fill="rgba(120,140,200,0.04)" />
-                  <ellipse cx="80" cy="175" rx="60" ry="35" fill="#1e2640" />
-                  <ellipse cx="80" cy="168" rx="45" ry="28" fill="#242e50" />
-                  <polygon points="80,125 70,155 90,155" fill="#f0f4ff" />
-                  <polygon points="80,125 68,150 72,155" fill="#e0e8f8" />
-                  <rect x="77" y="126" width="6" height="28" rx="2" fill="#6366f1" opacity="0.8" />
-                  <ellipse cx="80" cy="120" rx="12" ry="9" fill="url(#skinTone)" />
-                  <ellipse cx="80" cy="88" rx="30" ry="33" fill="url(#skinTone)" />
-                  <ellipse cx="80" cy="60" rx="30" ry="18" fill="#1a110a" />
-                  <ellipse cx="80" cy="57" rx="28" ry="14" fill="#231508" />
-                  <ellipse cx="56" cy="72" rx="8" ry="14" fill="#1a110a" />
-                  <ellipse cx="104" cy="72" rx="8" ry="14" fill="#1a110a" />
-                  <ellipse cx="50" cy="90" rx="5" ry="7" fill="#c08050" />
-                  <ellipse cx="110" cy="90" rx="5" ry="7" fill="#c08050" />
-                  <ellipse cx="68" cy="88" rx="5" ry="5.5" fill="white" />
-                  <ellipse cx="92" cy="88" rx="5" ry="5.5" fill="white" />
-                  <ellipse cx="68" cy="89" rx="3.5" ry="4" fill="#2d1800" />
-                  <ellipse cx="92" cy="89" rx="3.5" ry="4" fill="#2d1800" />
-                  <ellipse cx="69" cy="87.5" rx="1.3" ry="1.3" fill="white" opacity="0.8" />
-                  <ellipse cx="93" cy="87.5" rx="1.3" ry="1.3" fill="white" opacity="0.8" />
-                  <path d="M62 80 Q68 76 74 79" stroke="#1a110a" strokeWidth="2" fill="none" strokeLinecap="round" />
-                  <path d="M86 79 Q92 76 98 80" stroke="#1a110a" strokeWidth="2" fill="none" strokeLinecap="round" />
-                  <path d="M78 95 Q80 100 82 95" stroke="#b07840" strokeWidth="1.5" fill="none" strokeLinecap="round" />
-                  <path d={speaking ? "M72 108 Q80 115 88 108" : "M73 108 Q80 112 87 108"}
-                    stroke="#8a5a38" strokeWidth="2" fill="none" strokeLinecap="round"
-                    style={{ transition: 'd 0.2s ease' }} />
-                  <ellipse cx="80" cy="155" rx="35" ry="6" fill="rgba(100,120,180,0.08)" />
-                </svg>
+                background: 'linear-gradient(160deg,#141c33 0%,#0d1120 100%)',
+                border: speaking
+                  ? '2px solid rgba(99,102,241,0.7)'
+                  : '1.5px solid rgba(255,255,255,0.07)',
+                boxShadow: speaking ? '0 0 40px rgba(99,102,241,0.3) inset' : 'none',
+                transition: 'border 0.3s ease, box-shadow 0.3s ease'
+              }}>
+
+              {/* Ambient blob behind avatar */}
+              <div className="absolute w-48 h-48 rounded-full blur-3xl opacity-20"
+                style={{ background: speaking ? '#6366f1' : '#1e2a5a', transition: 'background 0.5s' }} />
+
+              {/* Professional initials avatar */}
+              <div className="relative z-10 flex flex-col items-center gap-3">
+                <div className="relative">
+                  <div
+                    className="w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold text-white select-none"
+                    style={{
+                      background: 'linear-gradient(135deg,#312e81,#4f46e5)',
+                      boxShadow: speaking
+                        ? '0 0 0 4px rgba(99,102,241,0.5), 0 0 40px rgba(99,102,241,0.4)'
+                        : '0 0 0 2px rgba(255,255,255,0.1)',
+                      transition: 'box-shadow 0.35s ease',
+                      fontSize: 36,
+                      letterSpacing: '-1px'
+                    }}
+                  >
+                    PS
+                  </div>
+                  {/* Speaking waveform ring */}
+                  {speaking && (
+                    <>
+                      <span className="absolute inset-0 rounded-full border-2 border-indigo-400/50 animate-ping" />
+                      <span className="absolute -inset-2 rounded-full border border-indigo-400/20 animate-pulse" />
+                    </>
+                  )}
+                  {/* Live mic dot */}
+                  {speaking && (
+                    <span className="absolute bottom-1 right-1 w-3.5 h-3.5 rounded-full bg-indigo-500 border-2 border-[#0d1120] flex items-center justify-center">
+                      <Mic className="w-2 h-2 text-white" />
+                    </span>
+                  )}
+                </div>
+
+                {/* Waveform bars when speaking */}
+                <div className="flex items-end gap-0.5 h-5">
+                  {[0,1,2,3,4].map(i => (
+                    <span key={i}
+                      className="w-1 rounded-full"
+                      style={{
+                        background: speaking ? '#818cf8' : 'rgba(255,255,255,0.12)',
+                        height: speaking ? `${10 + Math.abs(Math.sin(i * 1.3)) * 10}px` : '4px',
+                        animation: speaking ? `barwave 0.7s ${i * 0.1}s infinite alternate ease-in-out` : 'none',
+                        transition: 'height 0.2s, background 0.3s'
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Name tag — bottom left */}
+              <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)' }}>
+                {speaking && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />}
+                {aiLoading && <Loader2 className="w-3 h-3 animate-spin text-indigo-400" />}
+                <span className="text-white text-xs font-semibold">Priya Sharma</span>
+                <span className="text-gray-500 text-[10px] hidden sm:inline">· Google</span>
               </div>
             </div>
 
-            {/* Name / role / live status — replaces chat bubble */}
-            <div className="mt-5 text-center">
-              <p className="text-white text-base font-semibold tracking-tight">Priya Sharma</p>
-              <p className="text-gray-500 text-xs mb-2">Senior Software Engineer · Google</p>
-              <div className="flex items-center justify-center gap-2 text-xs font-medium">
-                {speaking && (
-                  <span className="flex gap-0.5 items-end h-3.5">
-                    {[0, 1, 2].map(i => (
-                      <span key={i} className="w-0.5 rounded-full bg-indigo-400"
-                        style={{ height: `${8 + i * 3}px`, animation: `bounce 0.6s ${i * 0.15}s infinite alternate` }} />
-                    ))}
-                  </span>
-                )}
-                {aiLoading && <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-400" />}
-                <span className={speaking ? 'text-indigo-300' : aiLoading ? 'text-cyan-300' : 'text-gray-500'}>
-                  {aiStatusText}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Captions — Google Meet style */}
-          {(spokenText || aiLoading || nudgeText) && (
-            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-[92%] max-w-xl" style={{ zIndex: 2 }}>
-              <div className="rounded-2xl px-6 py-3.5 text-center"
-                style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                {aiLoading ? (
-                  <span className="flex items-center justify-center gap-1.5 text-gray-500 text-sm">
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <span className="w-1.5 h-1.5 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </span>
-                ) : nudgeText ? (
-                  <p className="text-indigo-300 italic font-medium leading-relaxed" style={{ fontSize: '16px' }}>{nudgeText}</p>
-                ) : (
-                  <p className="text-gray-100 font-semibold leading-relaxed" style={{ fontSize: '18px' }}>{spokenText}</p>
-                )}
-              </div>
-            </div>
-          )}
-
-          <style>{`
-            @keyframes bounce { from { transform: scaleY(0.6); } to { transform: scaleY(1.4); } }
-            @keyframes floaty { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
-            @keyframes breathe { 0%, 100% { opacity: 0.9; } 50% { opacity: 1; } }
-          `}</style>
-
-          {/* Candidate camera — top right, larger, glass */}
-          <div
-            className="absolute top-4 right-4 rounded-xl overflow-hidden shadow-2xl bg-black"
-            style={{
-              width: 220, height: 124,
-              border: `1.5px solid ${camOn ? 'rgba(52,211,153,0.5)' : 'rgba(255,255,255,0.15)'}`,
-              backdropFilter: 'blur(10px)',
-              boxShadow: micOn && !loading ? '0 0 24px rgba(99,102,241,0.25)' : '0 8px 24px rgba(0,0,0,0.4)',
-              transition: 'all 0.3s ease'
-            }}
-          >
-            {loading && (
-              <div className="w-full h-full flex items-center justify-center text-gray-500">
-                <Loader2 className="w-5 h-5 animate-spin" />
-              </div>
-            )}
-            <video
-              ref={videoRef}
-              autoPlay
-              muted
-              playsInline
-              width={220}
-              height={124}
-              className={`w-full h-full object-cover ${loading || !camOn ? 'hidden' : ''}`}
-            />
-            <span className="absolute bottom-1.5 left-1.5 text-[10px] text-white/90 bg-black/50 backdrop-blur px-2 py-0.5 rounded-full flex items-center gap-1">
-              You
-              {listening && <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />}
-            </span>
-            {!camOn && !loading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 gap-1.5">
-                <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center text-xs font-semibold text-gray-300">You</div>
-                <VideoOff className="w-4 h-4 text-gray-500" />
-              </div>
-            )}
-          </div>
-
-          {/* Bottom controls — centered, Meet-style */}
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-3" style={{ zIndex: 3 }}>
+            {/* RIGHT — Candidate tile */}
+            <div className="flex-1 rounded-2xl relative overflow-hidden bg-black flex flex-col items-center justify-center"
+              style={{
+                border: listening
+                  ? '2px solid rgba(239,68,68,0.6)'
+                  : '1.5px solid rgba(255,255,255,0.07)',
+                boxShadow: listening ? '0 0 30px rgba(239,68,68,0.2) inset' : 'none',
+                transition: 'border 0.3s, box-shadow 0.3s'
+              }}>
+              {loading && (
+                <div className="flex flex-col items-center gap-2 text-gray-500">
+                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <span className="text-xs">Starting camera...</span>
+                </div>
+              )}
+              <video
+                ref={videoRef}
+                autoPlay muted playsInline
+                className={`w-full h-full object-cover ${loading || !camOn ? 'hidden' : ''}`}
+              />
+              {!camOn && !loading && (
+                <div className="flex flex-col items-center gap-2 text-gray-500">
+                  <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-xl font-bold text-gray-400">
+                    {candidateName ? candidateName[0].toUpperCase() : 'Y'}
+                  </div>
+                  <span className="text-xs text-gray-600">Camera off</span>
+                </div>
+              )}
+              {/* Name tag */}
+              <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg"
+                style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)' }}>
+                {listening && <span className="w-1.5
             <button
               onClick={toggleMic}
               aria-label={micOn ? 'Mute microphone' : 'Unmute microphone'}
