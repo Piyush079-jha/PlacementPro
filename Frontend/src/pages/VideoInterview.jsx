@@ -167,12 +167,18 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       setPreCheckStatus('Verifying your face is visible...');
       const video = videoRef.current;
       let faceOk = false;
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 8; i++) {
         try {
-          const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 });
-          const result = await faceapi.detectSingleFace(video, options);
-          if (result) { faceOk = true; break; }
-        } catch {}
+          if (video && video.readyState >= 2 && video.videoWidth > 0) {
+            const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 });
+            const result = await faceapi.detectSingleFace(video, options);
+            if (result) { faceOk = true; break; }
+          } else {
+            console.log('⏳ video not ready yet:', { readyState: video?.readyState, videoWidth: video?.videoWidth });
+          }
+        } catch (err) {
+          console.warn('Pre-check face detect error:', err);
+        }
         await new Promise(r => setTimeout(r, 500));
       }
       if (!faceOk) {
