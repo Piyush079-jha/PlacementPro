@@ -738,6 +738,12 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
         {!loading && !preCheckPassed && (
           <div className="rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-center"
             style={{ minHeight: '520px', background: 'radial-gradient(120% 100% at 50% 0%, #161a2e 0%, #0a0b14 55%, #060710 100%)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {/* Video must be mounted during pre-check too, so videoRef.current exists for face detection */}
+            <video
+              ref={videoRef}
+              autoPlay muted playsInline
+              className="absolute w-1 h-1 opacity-0 pointer-events-none"
+            />
             {preCheckError ? (
               <>
                 <span className="text-4xl">🚫</span>
