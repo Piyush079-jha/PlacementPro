@@ -543,8 +543,8 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
                 style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)' }}>
                 {speaking && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse" />}
                 {aiLoading && <Loader2 className="w-3 h-3 animate-spin text-indigo-400" />}
-                <span className="text-white text-xs font-semibold">Priya Sharma</span>
-                <span className="text-gray-500 text-[10px] hidden sm:inline">· Google</span>
+                <span className="text-white text-xs font-semibold">{interviewer.name}</span>
+                <span className="text-gray-500 text-[10px] hidden sm:inline">· {interviewer.company}</span>
               </div>
             </div>
 
