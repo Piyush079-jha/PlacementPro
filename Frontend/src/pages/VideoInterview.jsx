@@ -27,20 +27,32 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   };
   const [candidateName] = useState(() => resolveCandidateName(candidateNameProp));
 
-  // Random interviewer picked once per session
-  const INTERVIEWERS = [
-    { name: 'Priya Sharma',   initials: 'PS', company: 'Google',    gender: 'female' },
-    { name: 'Ananya Menon',   initials: 'AM', company: 'Microsoft', gender: 'female' },
-    { name: 'Sneha Kapoor',   initials: 'SK', company: 'Amazon',    gender: 'female' },
-    { name: 'Rahul Verma',    initials: 'RV', company: 'Flipkart',  gender: 'male'   },
-    { name: 'Arjun Nair',     initials: 'AN', company: 'Swiggy',    gender: 'male'   },
-    { name: 'Vikram Joshi',   initials: 'VJ', company: 'Razorpay',  gender: 'male'   },
-    { name: 'Kavya Reddy',    initials: 'KR', company: 'Meesho',    gender: 'female' },
-    { name: 'Rohan Mehta',    initials: 'RM', company: 'CRED',      gender: 'male'   },
-  ];
-  const [interviewer] = useState(() =>
-    INTERVIEWERS[Math.floor(Math.random() * INTERVIEWERS.length)]
-  );
+  // Dynamically generated interviewer — fresh combination every session
+  const generateInterviewer = () => {
+    const rand = arr => arr[Math.floor(Math.random() * arr.length)];
+
+    const femaleFirstNames = ['Priya','Ananya','Sneha','Kavya','Riya','Divya','Pooja','Nisha','Meera','Isha','Sakshi','Tanvi','Shreya','Aisha','Neha'];
+    const maleFirstNames   = ['Rahul','Arjun','Vikram','Rohan','Amit','Karan','Nikhil','Aditya','Siddharth','Varun','Dev','Yash','Aman','Akash','Raj'];
+    const lastNames        = ['Sharma','Verma','Nair','Joshi','Mehta','Kapoor','Reddy','Gupta','Iyer','Singh','Menon','Patel','Bose','Rao','Pillai','Malhotra'];
+    const companies        = ['Google','Microsoft','Amazon','Meta','Flipkart','Swiggy','Razorpay','CRED','Zepto','PhonePe','Atlassian','Paytm','Meesho','Ola','Zomato','Adobe','Salesforce','Uber','LinkedIn','Infosys'];
+    const roles            = ['Senior Engineer','Staff Engineer','Engineering Manager','Tech Lead','Principal Engineer','SDE-2','SDE-3'];
+
+    const gender    = rand(['male', 'female']);
+    const firstName = rand(gender === 'female' ? femaleFirstNames : maleFirstNames);
+    const lastName  = rand(lastNames);
+    const company   = rand(companies);
+    const role      = rand(roles);
+
+    return {
+      name: `${firstName} ${lastName}`,
+      initials: `${firstName[0]}${lastName[0]}`,
+      company,
+      role,
+      gender,
+    };
+  };
+
+  const [interviewer] = useState(() => generateInterviewer());
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
