@@ -5,6 +5,7 @@ import {
   Mic, MicOff, Video, VideoOff, PhoneOff, Loader2, Send, AudioLines,
   Settings, Wifi, Circle, Pencil, Sparkles
 } from 'lucide-react';
+import * as faceapi from 'face-api.js';
 
 export default function VideoInterview({ onBack, role = 'Full Stack Developer', difficulty = 'Medium', type = 'mixed', totalQuestions = 5, candidateName: candidateNameProp }) {
   // Resolve logged-in candidate's first name — adjust the localStorage keys
@@ -232,21 +233,38 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     return () => clearInterval(idleCheck);
   }, [loading, interviewEnded, feedbackLoading, speaking, aiLoading, answer, nudgeText, listening, history, currentQuestion, isLastQuestion]);
 
-  // ── Proctoring engine ──
+  // ── Proctoring engine — face-api.js landmark based ──
+  const faceModelsLoadedRef = useRef(false);
+
+  useEffect(() => {
+    const loadModels = async () => {
+      try {
+        await Promise.all([
+          faceapi.nets.tinyFaceDetector.loadFromUri('/models'),
+          faceapi.nets.faceLandmark68Net.loadFromUri('/models'),
+        ]);
+        faceModelsLoadedRef.current = true;
+      } catch (err) {
+        console.warn('face-api models failed to load:', err);
+      }
+    };
+    loadModels();
+  }, []);
+
   useEffect(() => {
     if (loading || interviewEnded || !camOn) return;
 
     const video = videoRef.current;
     if (!video) return;
 
-    // Hidden canvas for frame analysis
-    const canvas = document.createElement('canvas');
-    canvas.width = 160;
-    canvas.height = 120;
-    const ctx = canvas.getContext('2d');
+    // Cooldown ref so two warnings don't fire back-to-back
+    const lastWarnTimeRef = { current: 0 };
+    const WARN_COOLDOWN_MS = 12000;
 
     const issueWarning = (msg) => {
-      if (proctorDismissed) return;
+      const now = Date.now();
+      if (now - lastWarnTimeRef.current < WARN_COOLDOWN_MS) return;
+      lastWarnTimeRef.current = now;
       setWarningMsg(msg);
       setShowWarning(true);
       setWarningCount(prev => {
@@ -262,63 +280,96 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
         }
         return next;
       });
-      setTimeout(() => setShowWarning(false), 4000);
+      setTimeout(() => setShowWarning(false), 5000);
     };
 
-    // Face presence check using experimental FaceDetector API
     const checkFace = async () => {
       if (!video || video.readyState < 2 || interviewEnded) return;
+      if (!faceModelsLoadedRef.current) return;
 
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      try {
+        const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 });
+        const result = await faceapi.detectSingleFace(video, options).withFaceLandmarks();
 
-      // Motion detection — compare pixel diff with last frame
-      if (lastFrameRef.current) {
-        let diff = 0;
-        for (let i = 0; i < frame.data.length; i += 16) {
-          diff += Math.abs(frame.data[i] - lastFrameRef.current[i]);
+        // 1. No face detected
+        if (!result) {
+          issueWarning('⚠️ Face not visible. Please ensure your face is clearly in frame and well-lit.');
+          return;
         }
-        const motionScore = diff / (frame.data.length / 16);
-        if (motionScore > 28) {
-          lookAwayCountRef.current += 1;
-        } else {
-          lookAwayCountRef.current = Math.max(0, lookAwayCountRef.current - 1);
-        }
-        if (lookAwayCountRef.current >= 10) {
-          lookAwayCountRef.current = 0;
-          issueWarning('⚠️ Excessive movement detected. Please keep your head and eyes steady during the interview.');
-        }
-      }
-      lastFrameRef.current = frame.data.slice();
 
-      // Face presence using FaceDetector if available
-      if ('FaceDetector' in window) {
-        try {
-          const detector = new window.FaceDetector({ fastMode: true });
-          const faces = await detector.detect(video);
-          if (faces.length === 0) {
-            issueWarning('⚠️ No face detected. Please ensure your face is clearly visible on camera.');
-          } else if (faces.length > 1) {
-            issueWarning('⚠️ Multiple faces detected. Only the candidate should be visible.');
-          }
-        } catch {}
-      } else {
-        // Fallback: basic brightness check — very dark frame = likely camera blocked
-        let brightness = 0;
-        for (let i = 0; i < frame.data.length; i += 4) {
-          brightness += (frame.data[i] + frame.data[i+1] + frame.data[i+2]) / 3;
+        const { detection, landmarks } = result;
+        const box = detection.box;
+        const vw = video.videoWidth || 640;
+        const vh = video.videoHeight || 480;
+
+        // 2. Face too small — too far from camera / not in proper position
+        const faceArea = (box.width * box.height) / (vw * vh);
+        if (faceArea < 0.04) {
+          issueWarning('⚠️ Please sit closer to the camera. Your face should be clearly visible.');
+          return;
         }
-        brightness /= (frame.data.length / 4);
-        if (brightness < 15) {
-          issueWarning('⚠️ Camera appears blocked or too dark. Please check your camera.');
+
+        // 3. Face too large — too close to camera
+        if (faceArea > 0.55) {
+          issueWarning('⚠️ Please move a bit further from the camera for a proper interview frame.');
+          return;
         }
+
+        // 4. Face not centered — looking away or positioned off screen
+        const faceCenterX = box.x + box.width / 2;
+        const faceCenterY = box.y + box.height / 2;
+        const offCenterX = Math.abs(faceCenterX / vw - 0.5);
+        const offCenterY = Math.abs(faceCenterY / vh - 0.5);
+        if (offCenterX > 0.32 || offCenterY > 0.35) {
+          issueWarning('⚠️ Please face the camera directly. Do not look away during the interview.');
+          return;
+        }
+
+        // 5. Eye gaze — check if eyes are open and roughly level
+        const leftEye  = landmarks.getLeftEye();
+        const rightEye = landmarks.getRightEye();
+
+        const eyeCenter = (pts) => ({
+          x: pts.reduce((s, p) => s + p.x, 0) / pts.length,
+          y: pts.reduce((s, p) => s + p.y, 0) / pts.length,
+        });
+        const lc = eyeCenter(leftEye);
+        const rc = eyeCenter(rightEye);
+
+        // Eye height difference (head tilt)
+        const eyeTilt = Math.abs(lc.y - rc.y) / box.height;
+        if (eyeTilt > 0.18) {
+          issueWarning('⚠️ Excessive head tilt detected. Please keep your head upright and look at the camera.');
+          return;
+        }
+
+        // Eye vertical position — if eyes are in the bottom half of the face box the
+        // candidate is likely looking down at their phone or notes
+        const eyeAvgY = (lc.y + rc.y) / 2;
+        const eyeRelY = (eyeAvgY - box.y) / box.height;
+        if (eyeRelY > 0.65) {
+          issueWarning('⚠️ You appear to be looking down. Please maintain eye contact with the camera.');
+          return;
+        }
+
+        // 6. Attire check — use face-to-frame ratio and face vertical position
+        // If the face is in the bottom quarter of the frame, they're likely slouching
+        const faceTopRelative = box.y / vh;
+        if (faceTopRelative > 0.55) {
+          issueWarning('⚠️ Please sit upright. Your face should be in the upper-center of the frame.');
+          return;
+        }
+
+        // If face is at the very top (no upper body visible), prompt proper framing
+        if (faceTopRelative < 0.02 && faceArea > 0.25) {
+          issueWarning('⚠️ Please adjust your camera so your upper body is visible — not just your face.');
+          return;
+        }
+
+      } catch (err) {
+        console.warn('Proctor check error:', err);
       }
     };
-
-    // Camera off detection
-    if (!camOn) {
-      issueWarning('⚠️ Camera is turned off. Camera must remain on during the interview.');
-    }
 
     proctorIntervalRef.current = setInterval(checkFace, 8000);
     return () => clearInterval(proctorIntervalRef.current);
