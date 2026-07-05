@@ -332,6 +332,22 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1;
+
+    // Pick a voice matching the interviewer's gender
+    const voices = window.speechSynthesis.getVoices();
+    const isFemale = interviewer.gender === 'female';
+    const preferred = voices.filter(v =>
+      v.lang.startsWith('en') &&
+      (isFemale
+        ? /female|woman|zira|samantha|victoria|karen|moira|tessa|fiona|veena|susan|google uk english female|google us english/i.test(v.name)
+        : /male|man|david|mark|daniel|alex|fred|thomas|rishi|google uk english male/i.test(v.name))
+    );
+    // Fallback: any English voice, then whatever is available
+    const fallback = voices.filter(v => v.lang.startsWith('en'));
+    const picked = preferred[0] || fallback[0] || voices[0];
+    if (picked) utterance.voice = picked;
+    utterance.pitch = isFemale ? 1.15 : 0.9;
+
     utterance.onstart = () => setSpeaking(true);
     utterance.onend = () => setSpeaking(false);
     utterance.onerror = () => setSpeaking(false);
