@@ -513,7 +513,6 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       streamRef.current = stream;
-      if (videoRef.current) videoRef.current.srcObject = stream;
       setStatus('Camera ready');
       setLoading(false);
     } catch {
@@ -522,6 +521,12 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+    }
+  }, [loading, preCheckPassed]);
 
   const stopCamera = () => {
     try {
