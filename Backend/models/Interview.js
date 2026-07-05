@@ -7,6 +7,7 @@ const interviewSchema = new mongoose.Schema({
   questions: [{
     question: String,
     userAnswer: String,
+    answer: String,
     feedback: String,
     score: { type: Number, min: 0, max: 10 },
     idealAnswer: String
@@ -14,7 +15,14 @@ const interviewSchema = new mongoose.Schema({
   overallScore: { type: Number, default: 0 },
   overallFeedback: { type: String },
   strengths: [String],
+  weaknesses: [String],
   improvements: [String],
+  actionableTips: [String],
+  communicationScore: { type: Number, min: 0, max: 10 },
+  technicalScore: { type: Number, min: 0, max: 10 },
+  problemSolvingScore: { type: Number, min: 0, max: 10 },
+  confidenceScore: { type: Number, min: 0, max: 10 },
+  interviewType: { type: String, enum: ['text', 'video'], default: 'text' },
   duration: { type: Number },
   completedAt: { type: Date, default: Date.now }
 }, { timestamps: true });
