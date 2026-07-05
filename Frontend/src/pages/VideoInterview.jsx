@@ -232,6 +232,120 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
     return () => clearInterval(idleCheck);
   }, [loading, interviewEnded, feedbackLoading, speaking, aiLoading, answer, nudgeText, listening, history, currentQuestion, isLastQuestion]);
 
+  // ── Proctoring engine ──
+  useEffect(() => {
+    if (loading || interviewEnded || !camOn) return;
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    // Hidden canvas for frame analysis
+    const canvas = document.createElement('canvas');
+    canvas.width = 160;
+    canvas.height = 120;
+    const ctx = canvas.getContext('2d');
+
+    const issueWarning = (msg) => {
+      if (proctorDismissed) return;
+      setWarningMsg(msg);
+      setShowWarning(true);
+      setWarningCount(prev => {
+        const next = prev + 1;
+        setWarnings(w => [...w, { msg, time: new Date().toLocaleTimeString() }]);
+        if (next >= MAX_WARNINGS) {
+          setTimeout(() => {
+            toast.error('Interview terminated due to repeated violations.');
+            window.speechSynthesis.cancel();
+            stopCamera();
+            onBack();
+          }, 2500);
+        }
+        return next;
+      });
+      setTimeout(() => setShowWarning(false), 4000);
+    };
+
+    // Face presence check using experimental FaceDetector API
+    const checkFace = async () => {
+      if (!video || video.readyState < 2 || interviewEnded) return;
+
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+      // Motion detection — compare pixel diff with last frame
+      if (lastFrameRef.current) {
+        let diff = 0;
+        for (let i = 0; i < frame.data.length; i += 16) {
+          diff += Math.abs(frame.data[i] - lastFrameRef.current[i]);
+        }
+        const motionScore = diff / (frame.data.length / 16);
+        if (motionScore > 28) {
+          lookAwayCountRef.current += 1;
+        } else {
+          lookAwayCountRef.current = Math.max(0, lookAwayCountRef.current - 1);
+        }
+        if (lookAwayCountRef.current >= 5) {
+          lookAwayCountRef.current = 0;
+          issueWarning('⚠️ Excessive movement detected. Please keep your head and eyes steady during the interview.');
+        }
+      }
+      lastFrameRef.current = frame.data.slice();
+
+      // Face presence using FaceDetector if available
+      if ('FaceDetector' in window) {
+        try {
+          const detector = new window.FaceDetector({ fastMode: true });
+          const faces = await detector.detect(video);
+          if (faces.length === 0) {
+            issueWarning('⚠️ No face detected. Please ensure your face is clearly visible on camera.');
+          } else if (faces.length > 1) {
+            issueWarning('⚠️ Multiple faces detected. Only the candidate should be visible.');
+          }
+        } catch {}
+      } else {
+        // Fallback: basic brightness check — very dark frame = likely camera blocked
+        let brightness = 0;
+        for (let i = 0; i < frame.data.length; i += 4) {
+          brightness += (frame.data[i] + frame.data[i+1] + frame.data[i+2]) / 3;
+        }
+        brightness /= (frame.data.length / 4);
+        if (brightness < 15) {
+          issueWarning('⚠️ Camera appears blocked or too dark. Please check your camera.');
+        }
+      }
+    };
+
+    // Camera off detection
+    if (!camOn) {
+      issueWarning('⚠️ Camera is turned off. Camera must remain on during the interview.');
+    }
+
+    proctorIntervalRef.current = setInterval(checkFace, 3000);
+    return () => clearInterval(proctorIntervalRef.current);
+  }, [loading, interviewEnded, camOn]);
+
+  // Warn immediately when candidate turns camera off mid-interview
+  useEffect(() => {
+    if (!camOn && !loading && !interviewEnded && currentQuestion) {
+      setWarningMsg('⚠️ Camera turned off. Camera must stay on during the interview.');
+      setShowWarning(true);
+      setWarningCount(prev => {
+        const next = prev + 1;
+        setWarnings(w => [...w, { msg: 'Camera turned off', time: new Date().toLocaleTimeString() }]);
+        if (next >= MAX_WARNINGS) {
+          setTimeout(() => {
+            toast.error('Interview terminated — camera kept off repeatedly.');
+            window.speechSynthesis.cancel();
+            stopCamera();
+            onBack();
+          }, 2500);
+        }
+        return next;
+      });
+      setTimeout(() => setShowWarning(false), 5000);
+    }
+  }, [camOn]);
+
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) return;
