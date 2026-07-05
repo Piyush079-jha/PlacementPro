@@ -61,6 +61,9 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const [micOn, setMicOn] = useState(true);
   const [status, setStatus] = useState('Connecting to camera...');
   const [loading, setLoading] = useState(true);
+  const [preCheckPassed, setPreCheckPassed] = useState(false);
+  const [preCheckStatus, setPreCheckStatus] = useState('Checking camera...');
+  const [preCheckError, setPreCheckError] = useState('');
 
   const [history, setHistory] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState('');
@@ -134,13 +137,62 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   }, []);
 
   useEffect(() => {
-    if (loading || status !== 'Camera ready' || greetedRef.current) return;
+    if (loading || status !== 'Camera ready' || preCheckPassed) return;
+
+    const runPreCheck = async () => {
+      setPreCheckStatus('Checking camera and microphone...');
+
+      const videoTrack = streamRef.current?.getVideoTracks()[0];
+      const audioTrack = streamRef.current?.getAudioTracks()[0];
+      if (!videoTrack || videoTrack.readyState !== 'live') {
+        setPreCheckError('Camera is not active. Please allow camera access and refresh.');
+        return;
+      }
+      if (!audioTrack || audioTrack.readyState !== 'live') {
+        setPreCheckError('Microphone is not active. Please allow mic access and refresh.');
+        return;
+      }
+
+      setPreCheckStatus('Loading face detection...');
+      let waited = 0;
+      while (!faceModelsLoadedRef.current && waited < 8000) {
+        await new Promise(r => setTimeout(r, 300));
+        waited += 300;
+      }
+      if (!faceModelsLoadedRef.current) {
+        setPreCheckError('Face detection failed to load. Please refresh and try again.');
+        return;
+      }
+
+      setPreCheckStatus('Verifying your face is visible...');
+      const video = videoRef.current;
+      let faceOk = false;
+      for (let i = 0; i < 5; i++) {
+        try {
+          const options = new faceapi.TinyFaceDetectorOptions({ inputSize: 224, scoreThreshold: 0.4 });
+          const result = await faceapi.detectSingleFace(video, options);
+          if (result) { faceOk = true; break; }
+        } catch {}
+        await new Promise(r => setTimeout(r, 500));
+      }
+      if (!faceOk) {
+        setPreCheckError('We could not detect your face. Please sit facing the camera in good lighting, then refresh.');
+        return;
+      }
+
+      setPreCheckStatus('All checks passed!');
+      setTimeout(() => setPreCheckPassed(true), 800);
+    };
+
+    runPreCheck();
+  }, [loading, status, preCheckPassed]);
+
+  // Actual interview kickoff — only after pre-check passes
+  useEffect(() => {
+    if (!preCheckPassed || greetedRef.current) return;
     greetedRef.current = true;
-    // Backend owns the single greeting + first question now (candidateName is
-    // already sent in the request body below) — no client-side pre-greeting,
-    // so Priya only introduces herself once, like a real interviewer would.
     fetchNextTurn([]);
-  }, [loading, status]);
+  }, [preCheckPassed]);
 
   // Timer — starts only once the first question has actually been asked
   useEffect(() => {
@@ -186,7 +238,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   };
 
   useEffect(() => {
-    if (loading || interviewEnded || feedbackLoading) return;
+    if (loading || interviewEnded || feedbackLoading || !preCheckPassed) return;
     const idleCheck = setInterval(() => {
       const idleFor = Date.now() - lastActivityRef.current;
       const isIdle = !speaking && !aiLoading && !answer.trim() && !nudgeText && !listening;
@@ -254,7 +306,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   }, []);
 
   useEffect(() => {
-    if (loading || interviewEnded || !camOn) return;
+    if (loading || interviewEnded || !camOn || !preCheckPassed) return;
 
     const video = videoRef.current;
     if (!video) return;
@@ -403,7 +455,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
 
     proctorIntervalRef.current = setInterval(checkFace, 8000);
     return () => clearInterval(proctorIntervalRef.current);
-  }, [loading, interviewEnded, camOn]);
+  }, [loading, interviewEnded, camOn, preCheckPassed]);
 
   // Warn immediately when candidate turns camera off mid-interview
   useEffect(() => {
@@ -682,7 +734,29 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           </div>
         </div>
 
-        {/* ===== Interview Stage ===== */}
+        {/* ===== Pre-Interview Check ===== */}
+        {!loading && !preCheckPassed && (
+          <div className="rounded-3xl p-10 flex flex-col items-center justify-center gap-4 text-center"
+            style={{ minHeight: '520px', background: 'radial-gradient(120% 100% at 50% 0%, #161a2e 0%, #0a0b14 55%, #060710 100%)', border: '1px solid rgba(255,255,255,0.08)' }}>
+            {preCheckError ? (
+              <>
+                <span className="text-4xl">🚫</span>
+                <p className="text-red-400 font-semibold max-w-md">{preCheckError}</p>
+                <button onClick={() => window.location.reload()}
+                  className="mt-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-semibold hover:opacity-90 transition-all">
+                  Refresh and Try Again
+                </button>
+              </>
+            ) : (
+              <>
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-400" />
+                <p className="text-gray-300 font-medium">{preCheckStatus}</p>
+                <p className="text-gray-600 text-xs">Please stay in frame, facing the camera</p>
+              </>
+            )}
+          </div>
+        )}
+        {preCheckPassed && (
         <div className="relative rounded-3xl overflow-hidden"
           style={{
             minHeight: '520px',
@@ -895,7 +969,8 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
               <Settings className="w-5 h-5" />
             </button>
           </div>
-        </div>{/* END Interview Stage */}
+        </div>
+        )}{/* END Interview Stage */}
 
         {/* ===== Answer panel ===== */}
         {!loading && !interviewEnded && (
