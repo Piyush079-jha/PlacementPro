@@ -410,10 +410,8 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl px-4 sm:px-5 py-3"
           style={{ background: 'rgba(255,255,255,0.05)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.08)' }}>
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-white" />
-            </div>
-            <span className="font-bold text-white tracking-tight text-sm sm:text-base">PlacementPro</span>
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span className="text-white text-sm font-semibold tracking-tight">Live Interview</span>
           </div>
 
           <div className="hidden sm:flex flex-col items-center leading-tight">
