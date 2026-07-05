@@ -258,7 +258,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
             window.speechSynthesis.cancel();
             stopCamera();
             onBack();
-          }, 2500);
+          }, 6000);
         }
         return next;
       });
@@ -284,7 +284,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
         } else {
           lookAwayCountRef.current = Math.max(0, lookAwayCountRef.current - 1);
         }
-        if (lookAwayCountRef.current >= 5) {
+        if (lookAwayCountRef.current >= 10) {
           lookAwayCountRef.current = 0;
           issueWarning('⚠️ Excessive movement detected. Please keep your head and eyes steady during the interview.');
         }
@@ -320,7 +320,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
       issueWarning('⚠️ Camera is turned off. Camera must remain on during the interview.');
     }
 
-    proctorIntervalRef.current = setInterval(checkFace, 3000);
+    proctorIntervalRef.current = setInterval(checkFace, 8000);
     return () => clearInterval(proctorIntervalRef.current);
   }, [loading, interviewEnded, camOn]);
 
@@ -338,7 +338,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
             window.speechSynthesis.cancel();
             stopCamera();
             onBack();
-          }, 2500);
+          }, 6000);
         }
         return next;
       });
