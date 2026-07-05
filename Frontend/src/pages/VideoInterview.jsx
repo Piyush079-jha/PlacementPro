@@ -555,7 +555,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
               className={`w-11 h-11 rounded-full flex items-center justify-center border transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-400/60 ${micOn ? 'border-white/15 bg-white/5 text-gray-200 hover:border-indigo-400/40' : 'bg-red-500/20 border-red-500/40 text-red-400'}`}
               style={{ backdropFilter: 'blur(12px)' }}
             >
-              {micOn ? <Mic className="w-4.5 h-4.5" /> : <MicOff className="w-4.5 h-4.5" />}
+              {micOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
             </button>
             <button
               onClick={toggleCam}
@@ -563,14 +563,14 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
               className={`w-11 h-11 rounded-full flex items-center justify-center border transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-400/60 ${camOn ? 'border-white/15 bg-white/5 text-gray-200 hover:border-indigo-400/40' : 'bg-red-500/20 border-red-500/40 text-red-400'}`}
               style={{ backdropFilter: 'blur(12px)' }}
             >
-              {camOn ? <Video className="w-4.5 h-4.5" /> : <VideoOff className="w-4.5 h-4.5" />}
+              {camOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
             </button>
             <button
               onClick={endCall}
               aria-label="Leave interview"
               className="w-11 h-11 rounded-full flex items-center justify-center bg-red-500/90 text-white hover:bg-red-500 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-red-400/60"
             >
-              <PhoneOff className="w-4.5 h-4.5" />
+              <PhoneOff className="w-5 h-5" />
             </button>
             <button
               onClick={openSettings}
@@ -578,7 +578,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
               className="w-11 h-11 rounded-full flex items-center justify-center border border-white/15 bg-white/5 text-gray-300 hover:border-indigo-400/40 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400/60"
               style={{ backdropFilter: 'blur(12px)' }}
             >
-              <Settings className="w-4.5 h-4.5" />
+              <Settings className="w-5 h-5" />
             </button>
           </div>
         </div>
