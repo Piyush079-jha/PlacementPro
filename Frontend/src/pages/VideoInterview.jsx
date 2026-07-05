@@ -441,7 +441,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
             background: 'radial-gradient(120% 100% at 50% 0%, #161a2e 0%, #0a0b14 55%, #060710 100%)',
             border: '1px solid rgba(255,255,255,0.08)'
           }}>
-          <div className="pointer-events-none absolute inset-0" style={{ boxShadow: 'inset 0 0 140px 30px rgba(0,0,0,0.55)' }} />
+          <div className="pointer-events-none absolute inset-0" style={{ boxShadow: 'inset 0 0 80px 20px rgba(0,0,0,0.7)' }} />
 
           {/* ── Side-by-side tiles: Interviewer (left) | Candidate (right) ── */}
           <div className="absolute inset-0 flex items-stretch gap-2 p-3" style={{ zIndex: 1 }}>
