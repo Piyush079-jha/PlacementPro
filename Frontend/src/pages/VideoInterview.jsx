@@ -88,6 +88,18 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   const nudgeStageRef = useRef(0); 
   const usedLinesRef = useRef(new Set());
 
+  // --- Proctoring ---
+  const [warnings, setWarnings] = useState([]);
+  const [warningCount, setWarningCount] = useState(0);
+  const [showWarning, setShowWarning] = useState(false);
+  const [warningMsg, setWarningMsg] = useState('');
+  const [proctorDismissed, setProctorDismissed] = useState(false);
+  const MAX_WARNINGS = 3;
+  const procCanvasRef = useRef(null);
+  const lastFrameRef = useRef(null);
+  const lookAwayCountRef = useRef(0);
+  const proctorIntervalRef = useRef(null);
+
   // --- Device settings (camera/mic selection) ---
   const [showSettings, setShowSettings] = useState(false);
   const [videoDevices, setVideoDevices] = useState([]);
