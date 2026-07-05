@@ -27,6 +27,21 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
   };
   const [candidateName] = useState(() => resolveCandidateName(candidateNameProp));
 
+  // Random interviewer picked once per session
+  const INTERVIEWERS = [
+    { name: 'Priya Sharma',   initials: 'PS', company: 'Google',    gender: 'female' },
+    { name: 'Ananya Menon',   initials: 'AM', company: 'Microsoft', gender: 'female' },
+    { name: 'Sneha Kapoor',   initials: 'SK', company: 'Amazon',    gender: 'female' },
+    { name: 'Rahul Verma',    initials: 'RV', company: 'Flipkart',  gender: 'male'   },
+    { name: 'Arjun Nair',     initials: 'AN', company: 'Swiggy',    gender: 'male'   },
+    { name: 'Vikram Joshi',   initials: 'VJ', company: 'Razorpay',  gender: 'male'   },
+    { name: 'Kavya Reddy',    initials: 'KR', company: 'Meesho',    gender: 'female' },
+    { name: 'Rohan Mehta',    initials: 'RM', company: 'CRED',      gender: 'male'   },
+  ];
+  const [interviewer] = useState(() =>
+    INTERVIEWERS[Math.floor(Math.random() * INTERVIEWERS.length)]
+  );
+
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const [camOn, setCamOn] = useState(true);
