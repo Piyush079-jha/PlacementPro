@@ -505,7 +505,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
                       letterSpacing: '-1px'
                     }}
                   >
-                    PS
+                    {interviewer.initials}
                   </div>
                   {/* Speaking waveform ring */}
                   {speaking && (
