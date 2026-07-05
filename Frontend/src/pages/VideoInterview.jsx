@@ -551,6 +551,37 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
                 {listening && <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />}
                 <span className="text-white text-xs font-semibold">{candidateName || 'You'}</span>
               </div>
+            </div>{/* END RIGHT candidate tile */}
+          </div>{/* END side-by-side flex */}
+
+          {/* Captions — bottom center */}
+          {(spokenText || aiLoading || nudgeText) && (
+            <div className="absolute bottom-20 left-1/2 -translate-x-1/2 w-[94%] max-w-2xl" style={{ zIndex: 4 }}>
+              <div className="rounded-xl px-6 py-3 text-center"
+                style={{ background: 'rgba(0,0,0,0.78)', backdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                {aiLoading ? (
+                  <span className="flex items-center justify-center gap-1.5">
+                    {[0,1,2].map(i => (
+                      <span key={i} className="w-2 h-2 rounded-full bg-gray-500 animate-bounce"
+                        style={{ animationDelay: `${i * 150}ms` }} />
+                    ))}
+                  </span>
+                ) : nudgeText ? (
+                  <p className="text-indigo-300 italic text-sm leading-relaxed">{nudgeText}</p>
+                ) : (
+                  <p className="text-white text-sm sm:text-base leading-relaxed font-medium">{spokenText}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <style>{`
+            @keyframes barwave { from { transform: scaleY(0.5); } to { transform: scaleY(1.5); } }
+            @keyframes bounce { from { transform: scaleY(0.6); } to { transform: scaleY(1.4); } }
+          `}</style>
+
+          {/* Bottom controls — centered, Meet-style */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3" style={{ zIndex: 5 }}>
             <button
               onClick={toggleMic}
               aria-label={micOn ? 'Mute microphone' : 'Unmute microphone'}
@@ -583,7 +614,7 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
               <Settings className="w-5 h-5" />
             </button>
           </div>
-        </div>
+        </div>{/* END Interview Stage */}
 
         {/* ===== Answer panel ===== */}
         {!loading && !interviewEnded && (
