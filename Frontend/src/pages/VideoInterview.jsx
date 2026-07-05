@@ -747,7 +747,38 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
           <style>{`
             @keyframes barwave { from { transform: scaleY(0.5); } to { transform: scaleY(1.5); } }
             @keyframes bounce { from { transform: scaleY(0.6); } to { transform: scaleY(1.4); } }
+            @keyframes warningSlide { from { opacity:0; transform:translate(-50%,-10px); } to { opacity:1; transform:translate(-50%,0); } }
           `}</style>
+
+          {/* ── Proctoring warning overlay ── */}
+          {showWarning && (
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20"
+              style={{ animation: 'warningSlide 0.3s ease', minWidth: 320, maxWidth: '90%' }}>
+              <div className="rounded-xl px-5 py-3 flex items-start gap-3"
+                style={{ background: 'rgba(220,38,38,0.92)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,100,100,0.4)', boxShadow: '0 0 30px rgba(220,38,38,0.4)' }}>
+                <span className="text-2xl mt-0.5">🚨</span>
+                <div className="flex-1">
+                  <p className="text-white text-sm font-semibold leading-snug">{warningMsg}</p>
+                  <p className="text-red-200 text-xs mt-1">
+                    Warning {Math.min(warningCount, MAX_WARNINGS)} of {MAX_WARNINGS}
+                    {warningCount >= MAX_WARNINGS ? ' — Interview will be terminated.' : ' — Further violations will end the interview.'}
+                  </p>
+                </div>
+                <button onClick={() => { setShowWarning(false); setProctorDismissed(false); }}
+                  className="text-red-200 hover:text-white text-lg leading-none mt-0.5">✕</button>
+              </div>
+            </div>
+          )}
+
+          {/* Warning count badge on candidate tile — subtle indicator */}
+          {warningCount > 0 && !interviewEnded && (
+            <div className="absolute top-4 left-4 z-10">
+              <span className="flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full"
+                style={{ background: 'rgba(220,38,38,0.8)', color: 'white', backdropFilter: 'blur(8px)' }}>
+                ⚠️ {warningCount}/{MAX_WARNINGS} warnings
+              </span>
+            </div>
+          )}
 
           {/* Bottom controls — centered, Meet-style */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3" style={{ zIndex: 5 }}>
