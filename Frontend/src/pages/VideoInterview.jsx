@@ -304,6 +304,15 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
 
         // 2. Face too small — too far from camera / not in proper position
         const faceArea = (box.width * box.height) / (vw * vh);
+        console.log('📊 proctor metrics:', {
+          faceArea: faceArea.toFixed(3),
+          boxX: Math.round(box.x), boxY: Math.round(box.y),
+          boxW: Math.round(box.width), boxH: Math.round(box.height),
+          vw, vh,
+          offCenterX: Math.abs(((box.x + box.width/2) / vw - 0.5)).toFixed(3),
+          offCenterY: Math.abs(((box.y + box.height/2) / vh - 0.5)).toFixed(3),
+          faceTopRelative: (box.y / vh).toFixed(3)
+        });
         if (faceArea < 0.04) {
           issueWarning('⚠️ Please sit closer to the camera. Your face should be clearly visible.');
           return;
