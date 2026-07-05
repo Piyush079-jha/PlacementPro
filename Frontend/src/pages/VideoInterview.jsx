@@ -548,7 +548,9 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
               {/* Name tag */}
               <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 rounded-lg"
                 style={{ background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(8px)' }}>
-                {listening && <span className="w-1.5
+                {listening && <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />}
+                <span className="text-white text-xs font-semibold">{candidateName || 'You'}</span>
+              </div>
             <button
               onClick={toggleMic}
               aria-label={micOn ? 'Mute microphone' : 'Unmute microphone'}
