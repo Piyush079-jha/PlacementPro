@@ -235,6 +235,8 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
 
   // ── Proctoring engine — face-api.js landmark based ──
   const faceModelsLoadedRef = useRef(false);
+  const prevFaceCenterRef = useRef(null);
+  const movementStrikeRef = useRef(0);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -327,6 +329,25 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
         // 4. Face not centered — looking away or positioned off screen
         const faceCenterX = box.x + box.width / 2;
         const faceCenterY = box.y + box.height / 2;
+
+        // 4a. Movement check — compare this face center to the last check's center
+        if (prevFaceCenterRef.current) {
+          const dx = Math.abs(faceCenterX - prevFaceCenterRef.current.x) / box.width;
+          const dy = Math.abs(faceCenterY - prevFaceCenterRef.current.y) / box.height;
+          const movement = dx + dy;
+          if (movement > 0.35) {
+            movementStrikeRef.current += 1;
+          } else {
+            movementStrikeRef.current = Math.max(0, movementStrikeRef.current - 1);
+          }
+          if (movementStrikeRef.current >= 2) {
+            movementStrikeRef.current = 0;
+            prevFaceCenterRef.current = { x: faceCenterX, y: faceCenterY };
+            issueWarning('⚠️ Excessive head/body movement detected. Please stay steady and centered in frame.');
+            return;
+          }
+        }
+        prevFaceCenterRef.current = { x: faceCenterX, y: faceCenterY };
         const offCenterX = Math.abs(faceCenterX / vw - 0.5);
         const offCenterY = Math.abs(faceCenterY / vh - 0.5);
         if (offCenterX > 0.32 || offCenterY > 0.35) {
