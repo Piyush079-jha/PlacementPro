@@ -135,24 +135,24 @@ export default function Interview() {
   if (stage === STAGES.MODE) return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-3xl font-display font-bold text-white mb-1">Interview Prep</h1>
-        <p className="text-gray-500">AI-powered mock interviews with real-time evaluation and feedback</p>
+        <h1 className="text-3xl font-display font-bold text-white mb-1">Prep Zone</h1>
+        <p className="text-gray-500">AI-powered practice for every part of the placement process</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-3xl">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl">
         <button
-          onClick={() => setStage(STAGES.SETUP)}
+          onClick={() => { setMode('Technical'); setConfig(p => ({ ...p, type: 'mixed' })); setStage(STAGES.SETUP); }}
           className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
         >
           <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
             <MessageSquare className="w-5 h-5 text-primary-400" />
           </div>
-          <h2 className="font-display font-semibold text-white text-lg">Text Interview</h2>
+          <h2 className="font-display font-semibold text-white text-lg">Technical</h2>
           <p className="text-gray-500 text-sm leading-relaxed">
-            Classic written Q&A. Read each question, type your answer, and get instant AI scoring and feedback.
+            Written Q&A on technical, DSA, and role-specific topics, with instant AI scoring and feedback.
           </p>
           <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
-            Start text interview <ChevronRight className="w-4 h-4" />
+            Start <ChevronRight className="w-4 h-4" />
           </span>
         </button>
 
@@ -166,10 +166,58 @@ export default function Interview() {
           </div>
           <h2 className="font-display font-semibold text-white text-lg">Video Interview</h2>
           <p className="text-gray-500 text-sm leading-relaxed">
-            A live, AI-led interview with your webcam and voice — the interviewer speaks questions aloud and listens to your spoken answers, just like a real call.
+            A live, AI-led interview with your webcam and voice — just like a real call.
           </p>
           <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
-            Start video interview <ChevronRight className="w-4 h-4" />
+            Start <ChevronRight className="w-4 h-4" />
+          </span>
+        </button>
+
+        <button
+          onClick={() => { setMode('Verbal'); setConfig(p => ({ ...p, type: 'Verbal' })); setStage(STAGES.SETUP); }}
+          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
+        >
+          <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
+            <Languages className="w-5 h-5 text-primary-400" />
+          </div>
+          <h2 className="font-display font-semibold text-white text-lg">Verbal</h2>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            Comprehension, vocabulary, and communication-style questions with instant AI feedback.
+          </p>
+          <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
+            Start <ChevronRight className="w-4 h-4" />
+          </span>
+        </button>
+
+        <button
+          onClick={() => { setMcqCategory('Aptitude'); setStage(STAGES.MCQ_SETUP); }}
+          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
+        >
+          <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
+            <Brain className="w-5 h-5 text-primary-400" />
+          </div>
+          <h2 className="font-display font-semibold text-white text-lg">Aptitude</h2>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            Quant MCQs — percentages, time & work, series, and more — with instant right/wrong feedback.
+          </p>
+          <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
+            Start <ChevronRight className="w-4 h-4" />
+          </span>
+        </button>
+
+        <button
+          onClick={() => { setMcqCategory('Reasoning'); setStage(STAGES.MCQ_SETUP); }}
+          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
+        >
+          <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
+            <ListChecks className="w-5 h-5 text-primary-400" />
+          </div>
+          <h2 className="font-display font-semibold text-white text-lg">Reasoning</h2>
+          <p className="text-gray-500 text-sm leading-relaxed">
+            Logical MCQs — puzzles, series, blood relations, and more — with instant feedback.
+          </p>
+          <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
+            Start <ChevronRight className="w-4 h-4" />
           </span>
         </button>
       </div>
