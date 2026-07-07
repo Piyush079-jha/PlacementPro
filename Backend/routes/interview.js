@@ -246,4 +246,46 @@ router.get('/history', auth, async (req, res) => {
   }
 });
 
+// Generate MCQ-style questions for Aptitude / Reasoning practice
+router.post('/mcq-questions', auth, async (req, res) => {
+  try {
+    const { category, difficulty, count = 10 } = req.body;
+    if (!category) return res.status(400).json({ error: 'Category is required' });
+    if (!['Aptitude', 'Reasoning'].includes(category)) {
+      return res.status(400).json({ error: 'Category must be Aptitude or Reasoning' });
+    }
+
+    const systemPrompt = `You are an expert question setter for Indian campus placement exams (like TCS, Infosys, Wipro, Capgemini aptitude tests).
+Generate realistic, VARIED multiple-choice questions for ${category}. Avoid repeating the same question patterns across calls.
+Respond with valid JSON only.`;
+
+    const topicsByCategory = {
+      Aptitude: ['percentages', 'profit and loss', 'time and work', 'time speed distance', 'ratio and proportion', 'averages', 'simple and compound interest', 'number series', 'permutations and combinations', 'probability'],
+      Reasoning: ['blood relations', 'coding-decoding', 'syllogisms', 'seating arrangement', 'direction sense', 'series completion', 'analogies', 'statement and conclusion', 'clock and calendar', 'puzzles']
+    };
+    const topics = topicsByCategory[category];
+    const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+
+    const userMessage = `Generate ${count} ${difficulty || 'Medium'} difficulty MCQ questions for ${category}, leaning toward "${randomTopic}" where natural, with variety across the set.
+Return JSON array:
+[
+  {
+    "id": "q1",
+    "question": "question text",
+    "options": ["option A", "option B", "option C", "option D"],
+    "correctIndex": 0,
+    "explanation": "brief explanation of the correct answer"
+  }
+]`;
+
+    const result = await callClaude(systemPrompt, userMessage, 1400);
+    const questions = parseJSON(result);
+    if (!questions) return res.status(500).json({ error: 'Failed to generate questions' });
+
+    res.json({ success: true, questions, category, difficulty });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
