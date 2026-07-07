@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { MessageSquare, Play, CheckCircle, ChevronRight, Award, RotateCcw, Clock, Video } from 'lucide-react';
+import { MessageSquare, Play, CheckCircle, ChevronRight, Award, RotateCcw, Clock, Video, Brain, ListChecks, Languages, XCircle } from 'lucide-react';
 import VideoInterview from './VideoInterview';
 
 const roles = ['Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Data Scientist', 'Data Analyst', 'DevOps Engineer', 'ML Engineer', 'Android Developer', 'Product Manager'];
