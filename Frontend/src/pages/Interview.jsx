@@ -229,7 +229,7 @@ export default function Interview() {
   if (stage === STAGES.SETUP) return (
     <div className="space-y-6 animate-fade-in">
       <div>
-        <h1 className="text-3xl font-display font-bold text-white mb-1">Text Interview</h1>
+        <h1 className="text-3xl font-display font-bold text-white mb-1">{mode === 'Verbal' ? 'Verbal Practice' : 'Technical Interview'}</h1>
         <p className="text-gray-500">AI-powered mock interviews with real-time evaluation and feedback</p>
       </div>
 
