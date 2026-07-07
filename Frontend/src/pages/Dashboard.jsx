@@ -75,7 +75,7 @@ export default function Dashboard() {
 
   const quickActions = [
     { label: 'Analyze Resume', icon: FileText, path: '/resume', color: 'bg-blue-500/15 text-blue-400', desc: 'Get AI feedback' },
-    { label: 'Mock Interview', icon: MessageSquare, path: '/interview', color: 'bg-purple-500/15 text-purple-400', desc: 'Practice now' },
+    { label: 'Prep Zone', icon: MessageSquare, path: '/interview', color: 'bg-purple-500/15 text-purple-400', desc: 'Practice now' },
     { label: 'Find Jobs', icon: Briefcase, path: '/jobs', color: 'bg-green-500/15 text-green-400', desc: 'Browse listings' },
     { label: 'Detect Fake Job', icon: Shield, path: '/detect', color: 'bg-red-500/15 text-red-400', desc: 'Stay safe' },
   ];

@@ -408,9 +408,8 @@ export default function Interview() {
       </div>
     </div>
   );
-}
 
-if (stage === STAGES.MCQ_SETUP) return (
+  if (stage === STAGES.MCQ_SETUP) return (
     <div className="space-y-6 animate-fade-in">
       <div>
         <h1 className="text-3xl font-display font-bold text-white mb-1">{mcqCategory} Practice</h1>
@@ -497,7 +496,6 @@ if (stage === STAGES.MCQ_SETUP) return (
       </div>
     );
   }
-
   if (stage === STAGES.MCQ_RESULTS) return (
     <div className="space-y-5 animate-slide-up text-center max-w-lg mx-auto">
       <div className="text-6xl">🎯</div>
