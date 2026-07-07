@@ -8,7 +8,7 @@ const roles = ['Software Engineer', 'Frontend Developer', 'Backend Developer', '
 const difficulties = ['Easy', 'Medium', 'Hard'];
 const types = ['mixed', 'Technical', 'Behavioral', 'HR', 'DSA'];
 
-const STAGES = { MODE: 'mode', SETUP: 'setup', VIDEO_SETUP: 'video_setup', ACTIVE: 'active', REVIEW: 'review', RESULTS: 'results' };
+const STAGES = { MODE: 'mode', SETUP: 'setup', VIDEO_SETUP: 'video_setup', ACTIVE: 'active', REVIEW: 'review', RESULTS: 'results', MCQ_SETUP: 'mcq_setup', MCQ_ACTIVE: 'mcq_active', MCQ_RESULTS: 'mcq_results' };
 
 const ScoreBadge = ({ score }) => {
   const color = score >= 8 ? 'text-green-400 bg-green-500/10 border-green-500/20' : score >= 6 ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20';
