@@ -26,6 +26,13 @@ export default function Interview() {
   const [evalLoading, setEvalLoading] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [saved, setSaved] = useState(false);
+  const [mode, setMode] = useState('Technical');
+  const [mcqCategory, setMcqCategory] = useState('Aptitude');
+  const [mcqDifficulty, setMcqDifficulty] = useState('Medium');
+  const [mcqQuestions, setMcqQuestions] = useState([]);
+  const [mcqIndex, setMcqIndex] = useState(0);
+  const [mcqAnswers, setMcqAnswers] = useState({});
+  const [mcqLoading, setMcqLoading] = useState(false);
 
   const startInterview = async () => {
     if (!config.role) return toast.error('Please select a role');
