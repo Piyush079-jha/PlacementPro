@@ -93,6 +93,39 @@ export default function Interview() {
 
   const reset = () => { setStage(STAGES.MODE); setQuestions([]); setAnswers({}); setEvaluations({}); setSaved(false); };
 
+  const startMcq = async () => {
+    setMcqLoading(true);
+    try {
+      const res = await axios.post('/api/interview/mcq-questions', { category: mcqCategory, difficulty: mcqDifficulty, count: 10 });
+      setMcqQuestions(res.data.questions);
+      setMcqIndex(0);
+      setMcqAnswers({});
+      setStage(STAGES.MCQ_ACTIVE);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to generate questions');
+    } finally {
+      setMcqLoading(false);
+    }
+  };
+
+  const selectMcqAnswer = (optionIndex) => {
+    if (mcqAnswers[mcqIndex] != null) return;
+    setMcqAnswers(prev => ({ ...prev, [mcqIndex]: optionIndex }));
+  };
+
+  const nextMcqQuestion = () => {
+    if (mcqIndex < mcqQuestions.length - 1) setMcqIndex(i => i + 1);
+    else setStage(STAGES.MCQ_RESULTS);
+  };
+
+  const mcqScore = () => {
+    let correct = 0;
+    mcqQuestions.forEach((q, i) => { if (mcqAnswers[i] === q.correctIndex) correct++; });
+    return correct;
+  };
+
+  const resetMcq = () => { setStage(STAGES.MODE); setMcqQuestions([]); setMcqAnswers({}); setMcqIndex(0); };
+
   const avgScore = () => {
     const scores = Object.values(evaluations).filter(e => e?.score != null).map(e => e.score);
     return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) : 0;
