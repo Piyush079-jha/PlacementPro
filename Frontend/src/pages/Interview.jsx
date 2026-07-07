@@ -252,12 +252,14 @@ export default function Interview() {
             </button>
           ))}
         </div>
+        {mode !== 'Verbal' && (
         <div>
           <label className="label">Interview Type</label>
           <select className="input-field" value={config.type} onChange={e => setConfig(p => ({ ...p, type: e.target.value }))}>
             {types.map(t => <option key={t} value={t}>{t === 'mixed' ? 'Mixed (All types)' : t}</option>)}
           </select>
         </div>
+        )}
         <div>
           <label className="label">Number of Questions: {config.count}</label>
           <input type="range" min="3" max="10" value={config.count} onChange={e => setConfig(p => ({ ...p, count: parseInt(e.target.value) }))}
