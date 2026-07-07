@@ -410,5 +410,114 @@ export default function Interview() {
   );
 }
 
+if (stage === STAGES.MCQ_SETUP) return (
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-3xl font-display font-bold text-white mb-1">{mcqCategory} Practice</h1>
+        <p className="text-gray-500">MCQs with instant right/wrong feedback and explanations</p>
+      </div>
+      <div className="card max-w-lg space-y-5">
+        <h2 className="font-display font-semibold text-white flex items-center gap-2">
+          <Play className="w-4 h-4 text-primary-400" /> Configure Your Practice
+        </h2>
+        <div className="grid grid-cols-3 gap-3">
+          {difficulties.map(d => (
+            <button key={d} onClick={() => setMcqDifficulty(d)}
+              className={`py-2.5 rounded-xl text-sm font-medium border transition-all ${mcqDifficulty === d ? 'bg-primary-500 border-primary-500 text-white' : 'border-white/10 text-gray-400 hover:border-primary-500/30'}`}>
+              {d}
+            </button>
+          ))}
+        </div>
+        <button onClick={startMcq} disabled={mcqLoading} className="btn-primary w-full py-3 flex items-center justify-center gap-2 disabled:opacity-50">
+          {mcqLoading ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Generating...</> : <><Play className="w-4 h-4" /> Start Practice</>}
+        </button>
+        <button onClick={() => setStage(STAGES.MODE)} className="btn-ghost w-full text-sm">← Back to mode selection</button>
+      </div>
+    </div>
+  );
+
+  if (stage === STAGES.MCQ_ACTIVE) {
+    const q = mcqQuestions[mcqIndex];
+    const selected = mcqAnswers[mcqIndex];
+    const answered = selected != null;
+
+    return (
+      <div className="space-y-5 animate-fade-in">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-display font-bold text-white">{mcqCategory} Practice</h1>
+            <p className="text-gray-500 text-sm">{mcqDifficulty}</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-gray-400">Question {mcqIndex + 1}/{mcqQuestions.length}</p>
+            <div className="flex gap-1 mt-1">
+              {mcqQuestions.map((_, i) => (
+                <div key={i} className={`h-1 w-6 rounded-full transition-all ${i < mcqIndex ? 'bg-green-400' : i === mcqIndex ? 'bg-primary-400' : 'bg-white/10'}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="card border border-primary-500/15">
+          <p className="text-white text-lg leading-relaxed font-medium">{q.question}</p>
+        </div>
+
+        <div className="space-y-3">
+          {q.options.map((opt, i) => {
+            let stateClasses = 'border-white/10 hover:border-primary-500/30 text-gray-300';
+            if (answered) {
+              if (i === q.correctIndex) stateClasses = 'border-green-500/40 bg-green-500/10 text-green-300';
+              else if (i === selected) stateClasses = 'border-red-500/40 bg-red-500/10 text-red-300';
+              else stateClasses = 'border-white/5 text-gray-600';
+            }
+            return (
+              <button key={i} onClick={() => selectMcqAnswer(i)} disabled={answered}
+                className={`w-full text-left px-4 py-3 rounded-xl border transition-all text-sm flex items-center gap-3 ${stateClasses}`}>
+                {answered && i === q.correctIndex && <CheckCircle className="w-4 h-4 shrink-0" />}
+                {answered && i === selected && i !== q.correctIndex && <XCircle className="w-4 h-4 shrink-0" />}
+                <span>{opt}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {answered && (
+          <div className="space-y-3 animate-slide-up">
+            <div className="card border border-primary-500/20">
+              <h3 className="font-semibold text-white mb-2">
+                {selected === q.correctIndex ? 'Correct!' : 'Not quite'}
+              </h3>
+              <p className="text-gray-300 text-sm leading-relaxed">{q.explanation}</p>
+            </div>
+            <button onClick={nextMcqQuestion} className="btn-primary flex items-center gap-2">
+              {mcqIndex < mcqQuestions.length - 1 ? <>Next Question <ChevronRight className="w-4 h-4" /></> : <>Finish <CheckCircle className="w-4 h-4" /></>}
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (stage === STAGES.MCQ_RESULTS) return (
+    <div className="space-y-5 animate-slide-up text-center max-w-lg mx-auto">
+      <div className="text-6xl">🎯</div>
+      <h1 className="text-3xl font-display font-bold text-white">Practice Complete!</h1>
+      <div className="card">
+        <div className="text-5xl font-display font-bold text-gradient-blue mb-2">{mcqScore()}/{mcqQuestions.length}</div>
+        <p className="text-gray-400">Correct Answers</p>
+        <div className="grid grid-cols-2 gap-4 mt-6 pt-4 border-t border-white/5 text-sm text-left">
+          <div><span className="text-gray-500">Category</span><p className="text-white font-medium mt-0.5">{mcqCategory}</p></div>
+          <div><span className="text-gray-500">Difficulty</span><p className="text-white font-medium mt-0.5">{mcqDifficulty}</p></div>
+        </div>
+      </div>
+      <div className="flex gap-3">
+        <button onClick={resetMcq} className="btn-primary flex-1 flex items-center justify-center gap-2">
+          <RotateCcw className="w-4 h-4" /> Try Again
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // Polyfill missing import
 function Zap({ className }) { return <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>; }
