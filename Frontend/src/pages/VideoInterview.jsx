@@ -1057,6 +1057,10 @@ export default function VideoInterview({ onBack, role = 'Full Stack Developer', 
                 placeholder="Type your answer..."
                 value={answer}
                 onChange={e => setAnswer(e.target.value)}
+                onPaste={(e) => { e.preventDefault(); toast.error('Pasting is disabled during the interview. Please type your own answer.'); }}
+                onCopy={(e) => e.preventDefault()}
+                onCut={(e) => e.preventDefault()}
+                onContextMenu={(e) => e.preventDefault()}
                 disabled={aiLoading}
               />
             )}
