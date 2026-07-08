@@ -257,6 +257,15 @@ export default function Interview() {
     return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) : 0;
   };
 
+  useEffect(() => {
+    if (stage !== STAGES.OA_ACTIVE) return;
+    if (oaTimeLeft <= 0) { advanceOASection(); return; }
+    const timer = setInterval(() => setOaTimeLeft(t => t - 1), 1000);
+    return () => clearInterval(timer);
+  }, [stage, oaTimeLeft, oaSectionIndex]);
+
+  const formatTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
   /* ── MODE PICKER ── */
   if (stage === STAGES.MODE) return (
     <div className="space-y-6 animate-fade-in">
