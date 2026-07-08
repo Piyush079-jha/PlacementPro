@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { MessageSquare, Play, CheckCircle, ChevronRight, Award, RotateCcw, Clock, Video, Brain, ListChecks, Languages, XCircle } from 'lucide-react';
+import { MessageSquare, Play, CheckCircle, ChevronRight, Award, RotateCcw, Clock, Video, Brain, ListChecks, Languages, XCircle, FileText, Timer } from 'lucide-react';
 import VideoInterview from './VideoInterview';
+import Editor from '@monaco-editor/react';
 
 const roles = ['Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Data Scientist', 'Data Analyst', 'DevOps Engineer', 'ML Engineer', 'Android Developer', 'Product Manager'];
 const difficulties = ['Easy', 'Medium', 'Hard'];
