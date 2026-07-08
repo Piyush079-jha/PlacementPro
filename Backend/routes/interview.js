@@ -288,4 +288,86 @@ Return JSON array:
   }
 });
 
-module.exports = router;
+// Execute code against test cases using Piston (free, no API key required)
+router.post('/run-code', auth, async (req, res) => {
+  try {
+    const axios = require('axios');
+    const { code, language, testCases } = req.body;
+    if (!code || !language) return res.status(400).json({ error: 'Code and language are required' });
+    if (!testCases || !testCases.length) return res.status(400).json({ error: 'Test cases are required' });
+
+    const languageMap = {
+      javascript: { language: 'javascript', version: '18.15.0' },
+      python: { language: 'python', version: '3.10.0' },
+      java: { language: 'java', version: '15.0.2' },
+      cpp: { language: 'cpp', version: '10.2.0' },
+      c: { language: 'c', version: '10.2.0' }
+    };
+    const langConfig = languageMap[language];
+    if (!langConfig) return res.status(400).json({ error: 'Unsupported language' });
+
+    const fileNames = {
+      javascript: 'main.js', python: 'main.py', java: 'Main.java', cpp: 'main.cpp', c: 'main.c'
+    };
+
+    const results = [];
+    for (const tc of testCases) {
+      try {
+        const pistonRes = await axios.post('https://emkc.org/api/v2/piston/execute', {
+          language: langConfig.language,
+          version: langConfig.version,
+          files: [{ name: fileNames[language], content: code }],
+          stdin: tc.input || ''
+        });
+        const data = pistonRes.data;
+        const actualOutput = (data.run?.stdout || '').trim();
+        const expectedOutput = (tc.expectedOutput || '').trim();
+        const passed = actualOutput === expectedOutput;
+
+        results.push({
+          input: tc.input,
+          expectedOutput,
+          actualOutput,
+          passed,
+          stderr: data.run?.stderr || '',
+          hidden: tc.hidden || false
+        });
+      } catch (tcErr) {
+        results.push({ input: tc.input, expectedOutput: tc.expectedOutput, actualOutput: '', passed: false, stderr: 'Execution failed', hidden: tc.hidden || false });
+      }
+    }
+
+    const passedCount = results.filter(r => r.passed).length;
+    res.json({ success: true, results, passedCount, totalCount: results.length, allPassed: passedCount === results.length });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Generate coding/DSA problems with test cases for the Online Assessment
+router.post('/coding-questions', auth, async (req, res) => {
+  try {
+    const { difficulty, count = 2, language = 'javascript' } = req.body;
+
+    const systemPrompt = `You are an expert DSA problem setter for Indian campus placement Online Assessments (like TCS NQT, Infosys, Capgemini).
+Generate realistic coding problems with clear input/output format, similar to real OA coding rounds.
+Respond with valid JSON only.`;
+
+    const topics = ['arrays', 'strings', 'basic loops and conditionals', 'sorting', 'searching', 'recursion basics', 'hashmaps', 'two pointers'];
+    const randomTopic = topics[Math.floor(Math.random() * topics.length)];
+
+    const userMessage = `Generate ${count} ${difficulty || 'Medium'} difficulty coding problems, leaning toward "${randomTopic}" where natural.
+Each problem must be solvable by reading input from stdin and printing output to stdout (like a real OA judge).
+Provide 3 test cases per problem: 2 visible (hidden: false) and 1 hidden (hidden: true).
+Return JSON array:
+[
+  {
+    "id": "c1",
+    "title": "short problem title",
+    "description": "full problem statement including input/output format",
+    "constraints": "constraints text",
+    "starterCode": "function/template starter code for ${language} that reads stdin and prints stdout",
+    "testCases": [
+      { "input": "stdin input text", "expectedOutput": "expected stdout text", "hidden": false },
+      { "input": "stdin input text", "expectedOutput": "expected stdout text", "hidden": false },
+      { "input": "stdin input text", "expectedOutput": "expected stdout
