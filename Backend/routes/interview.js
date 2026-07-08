@@ -370,4 +370,19 @@ Return JSON array:
     "testCases": [
       { "input": "stdin input text", "expectedOutput": "expected stdout text", "hidden": false },
       { "input": "stdin input text", "expectedOutput": "expected stdout text", "hidden": false },
-      { "input": "stdin input text", "expectedOutput": "expected stdout
+      { "input": "stdin input text", "expectedOutput": "expected stdout text", "hidden": true }
+    ]
+  }
+]`;
+
+    const result = await callClaude(systemPrompt, userMessage, 2000);
+    const questions = parseJSON(result);
+    if (!questions) return res.status(500).json({ error: 'Failed to generate coding questions' });
+
+    res.json({ success: true, questions, difficulty });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+module.exports = router; "expectedOutput": "expected stdout
