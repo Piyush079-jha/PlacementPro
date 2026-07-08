@@ -276,15 +276,16 @@ export default function Interview() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 max-w-5xl">
         <button
-          onClick={() => { setMode('Technical'); setConfig(p => ({ ...p, type: 'mixed' })); setStage(STAGES.SETUP); }}
-          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
+          onClick={() => setStage(STAGES.OA_SETUP)}
+          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group relative overflow-hidden"
         >
+          <span className="absolute top-3 right-3 text-[10px] font-semibold uppercase tracking-wide bg-primary-500/15 text-primary-400 px-2 py-0.5 rounded-full">New</span>
           <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
-            <MessageSquare className="w-5 h-5 text-primary-400" />
+            <FileText className="w-5 h-5 text-primary-400" />
           </div>
-          <h2 className="font-display font-semibold text-white text-lg">Technical</h2>
+          <h2 className="font-display font-semibold text-white text-lg">Online Assessment</h2>
           <p className="text-gray-500 text-sm leading-relaxed">
-            Written Q&A on technical, DSA, and role-specific topics, with instant AI scoring and feedback.
+            A real OA-style test — Aptitude, Reasoning, Verbal, and Coding sections, each timed, just like TCS/Infosys/Capgemini drives.
           </p>
           <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
             Start <ChevronRight className="w-4 h-4" />
