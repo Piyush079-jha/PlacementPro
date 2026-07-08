@@ -143,6 +143,115 @@ export default function Interview() {
 
   const resetMcq = () => { setStage(STAGES.MODE); setMcqQuestions([]); setMcqAnswers({}); setMcqIndex(0); };
 
+  const startOA = async () => {
+    setOaLoading(true);
+    try {
+      const [aptRes, reaRes, verRes, codeRes] = await Promise.all([
+        axios.post('/api/interview/mcq-questions', { category: 'Aptitude', difficulty: 'Medium', count: 10 }),
+        axios.post('/api/interview/mcq-questions', { category: 'Reasoning', difficulty: 'Medium', count: 10 }),
+        axios.post('/api/interview/questions', { role: 'Software Engineer', difficulty: 'Medium', count: 5, type: 'Verbal' }),
+        axios.post('/api/interview/coding-questions', { difficulty: 'Medium', count: 2, language: 'javascript' })
+      ]);
+      setOaData({
+        Aptitude: aptRes.data.questions,
+        Reasoning: reaRes.data.questions,
+        Verbal: verRes.data.questions,
+        Coding: codeRes.data.questions
+      });
+      setOaAnswers({ Aptitude: {}, Reasoning: {}, Verbal: {}, Coding: {} });
+      setOaCode(Object.fromEntries(codeRes.data.questions.map((q, i) => [i, q.starterCode || ''])));
+      setOaRunResults({});
+      setOaVerbalEval({});
+      setOaSectionIndex(0);
+      setOaCodingIndex(0);
+      setOaVerbalIndex(0);
+      setOaTimeLeft(OA_SECTION_TIME[OA_SECTIONS[0]]);
+      setStage(STAGES.OA_ACTIVE);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to generate assessment. Please try again.');
+    } finally {
+      setOaLoading(false);
+    }
+  };
+
+  const advanceOASection = () => {
+    if (oaSectionIndex < OA_SECTIONS.length - 1) {
+      const next = oaSectionIndex + 1;
+      setOaSectionIndex(next);
+      setOaTimeLeft(OA_SECTION_TIME[OA_SECTIONS[next]]);
+      setOaCodingIndex(0);
+      setOaVerbalIndex(0);
+    } else {
+      setStage(STAGES.OA_RESULTS);
+    }
+  };
+
+  const selectOAMcqAnswer = (section, qIndex, optionIndex) => {
+    setOaAnswers(prev => ({ ...prev, [section]: { ...prev[section], [qIndex]: optionIndex } }));
+  };
+
+  const evaluateOAVerbal = async () => {
+    const q = oaData.Verbal[oaVerbalIndex];
+    const answer = oaAnswers.Verbal[oaVerbalIndex];
+    if (!answer?.trim() || answer.trim().length < 10) return toast.error('Please write a proper answer (at least 10 characters)');
+    setOaVerbalLoading(true);
+    try {
+      const res = await axios.post('/api/interview/evaluate', { question: q.question, answer, role: 'Software Engineer', type: 'Verbal' });
+      setOaVerbalEval(prev => ({ ...prev, [oaVerbalIndex]: res.data.evaluation }));
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Evaluation failed');
+    } finally {
+      setOaVerbalLoading(false);
+    }
+  };
+
+  const runOACode = async () => {
+    const problem = oaData.Coding[oaCodingIndex];
+    const code = oaCode[oaCodingIndex] || '';
+    if (!code.trim()) return toast.error('Please write some code first');
+    setOaRunning(true);
+    try {
+      const res = await axios.post('/api/interview/run-code', { code, language: 'javascript', testCases: problem.testCases });
+      setOaRunResults(prev => ({ ...prev, [oaCodingIndex]: res.data }));
+      setOaAnswers(prev => ({ ...prev, Coding: { ...prev.Coding, [oaCodingIndex]: { code, passedCount: res.data.passedCount, totalCount: res.data.totalCount } } }));
+      if (res.data.allPassed) toast.success('All test cases passed!');
+      else toast(`${res.data.passedCount}/${res.data.totalCount} test cases passed`);
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Code execution failed');
+    } finally {
+      setOaRunning(false);
+    }
+  };
+
+  const oaSectionScore = (section) => {
+    if (section === 'Coding') {
+      const entries = Object.values(oaAnswers.Coding);
+      if (!entries.length) return { correct: 0, total: oaData.Coding.length };
+      const totalPassed = entries.reduce((sum, e) => sum + (e.passedCount || 0), 0);
+      const totalCases = entries.reduce((sum, e) => sum + (e.totalCount || 0), 0);
+      return { correct: totalPassed, total: totalCases };
+    }
+    if (section === 'Verbal') {
+      const scores = Object.values(oaVerbalEval).map(e => e?.score).filter(s => s != null);
+      const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+      return { correct: avg, total: 10 };
+    }
+    let correct = 0;
+    oaData[section].forEach((q, i) => { if (oaAnswers[section][i] === q.correctIndex) correct++; });
+    return { correct, total: oaData[section].length };
+  };
+
+  const resetOA = () => {
+    setStage(STAGES.MODE);
+    setOaData({ Aptitude: [], Reasoning: [], Verbal: [], Coding: [] });
+    setOaAnswers({ Aptitude: {}, Reasoning: {}, Verbal: {}, Coding: {} });
+    setOaSectionIndex(0);
+    setOaCodingIndex(0);
+    setOaVerbalIndex(0);
+    setOaRunResults({});
+    setOaVerbalEval({});
+  };
+
   const avgScore = () => {
     const scores = Object.values(evaluations).filter(e => e?.score != null).map(e => e.score);
     return scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length * 10) : 0;
