@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { MessageSquare, Play, CheckCircle, ChevronRight, Award, RotateCcw, Clock, Video, Brain, ListChecks, Languages, XCircle, FileText, Timer } from 'lucide-react';
