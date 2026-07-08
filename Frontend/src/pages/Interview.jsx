@@ -632,6 +632,191 @@ export default function Interview() {
       </div>
     );
   }
+  if (stage === STAGES.OA_SETUP) return (
+    <div className="space-y-6 animate-fade-in">
+      <div>
+        <h1 className="text-3xl font-display font-bold text-white mb-1">Online Assessment</h1>
+        <p className="text-gray-500">Aptitude, Reasoning, Verbal, and Coding — each section is timed, just like a real OA</p>
+      </div>
+      <div className="card max-w-lg space-y-5">
+        <h2 className="font-display font-semibold text-white flex items-center gap-2">
+          <Play className="w-4 h-4 text-primary-400" /> What to expect
+        </h2>
+        <div className="space-y-3">
+          {OA_SECTIONS.map(s => (
+            <div key={s} className="flex items-center justify-between px-4 py-3 rounded-xl border border-white/10 text-sm">
+              <span className="text-gray-300">{s}</span>
+              <span className="text-gray-500 flex items-center gap-1"><Timer className="w-3.5 h-3.5" /> {OA_SECTION_TIME[s] / 60} min</span>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-600">Each section auto-submits and moves to the next when time runs out. You cannot go back to a previous section.</p>
+        <button onClick={startOA} disabled={oaLoading} className="btn-primary w-full py-3 flex items-center justify-center gap-2 disabled:opacity-50">
+          {oaLoading ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Preparing assessment...</> : <><Play className="w-4 h-4" /> Start Assessment</>}
+        </button>
+        <button onClick={() => setStage(STAGES.MODE)} className="btn-ghost w-full text-sm">← Back to mode selection</button>
+      </div>
+    </div>
+  );
+
+  if (stage === STAGES.OA_ACTIVE) {
+    const section = OA_SECTIONS[oaSectionIndex];
+
+    return (
+      <div className="space-y-5 animate-fade-in">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            {OA_SECTIONS.map((s, i) => (
+              <span key={s} className={`badge text-xs ${i === oaSectionIndex ? 'bg-primary-500/20 text-primary-300 border border-primary-500/30' : i < oaSectionIndex ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-gray-600'}`}>{s}</span>
+            ))}
+          </div>
+          <div className={`flex items-center gap-1.5 font-mono text-sm ${oaTimeLeft <= 30 ? 'text-red-400' : 'text-gray-300'}`}>
+            <Clock className="w-4 h-4" /> {formatTime(oaTimeLeft)}
+          </div>
+        </div>
+
+        {(section === 'Aptitude' || section === 'Reasoning') && (
+          <div className="space-y-4">
+            {oaData[section].map((q, i) => (
+              <div key={i} className="card space-y-3">
+                <p className="text-white font-medium text-sm">{i + 1}. {q.question}</p>
+                <div className="space-y-2">
+                  {q.options.map((opt, oi) => (
+                    <button key={oi} onClick={() => selectOAMcqAnswer(section, i, oi)}
+                      className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${oaAnswers[section][i] === oi ? 'border-primary-500/50 bg-primary-500/10 text-primary-300' : 'border-white/10 text-gray-300 hover:border-primary-500/30'}`}>
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+            <button onClick={advanceOASection} className="btn-primary flex items-center gap-2">
+              {oaSectionIndex < OA_SECTIONS.length - 1 ? <>Submit & Next Section <ChevronRight className="w-4 h-4" /></> : <>Finish Assessment <CheckCircle className="w-4 h-4" /></>}
+            </button>
+          </div>
+        )}
+
+        {section === 'Verbal' && (() => {
+          const q = oaData.Verbal[oaVerbalIndex];
+          const ev = oaVerbalEval[oaVerbalIndex];
+          if (!q) return null;
+          return (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-400">Question {oaVerbalIndex + 1}/{oaData.Verbal.length}</p>
+              </div>
+              <div className="card">
+                <p className="text-white text-lg leading-relaxed font-medium">{q.question}</p>
+              </div>
+              <textarea
+                className="input-field min-h-28 resize-none"
+                placeholder="Type your answer here..."
+                value={oaAnswers.Verbal[oaVerbalIndex] || ''}
+                onChange={e => setOaAnswers(prev => ({ ...prev, Verbal: { ...prev.Verbal, [oaVerbalIndex]: e.target.value } }))}
+                disabled={!!ev}
+              />
+              {!ev ? (
+                <div className="flex gap-3">
+                  <button onClick={evaluateOAVerbal} disabled={oaVerbalLoading} className="btn-primary flex items-center gap-2 disabled:opacity-50">
+                    {oaVerbalLoading ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Evaluating...</> : <><Zap className="w-4 h-4" /> Get Feedback</>}
+                  </button>
+                  <button onClick={() => oaVerbalIndex < oaData.Verbal.length - 1 ? setOaVerbalIndex(i => i + 1) : advanceOASection()} className="btn-ghost text-sm">
+                    Skip →
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div className="card border border-primary-500/20">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-white text-sm">Feedback</h3>
+                      <ScoreBadge score={ev.score} />
+                    </div>
+                    <p className="text-gray-300 text-sm leading-relaxed">{ev.feedback}</p>
+                  </div>
+                  <button onClick={() => oaVerbalIndex < oaData.Verbal.length - 1 ? setOaVerbalIndex(i => i + 1) : advanceOASection()} className="btn-primary flex items-center gap-2">
+                    {oaVerbalIndex < oaData.Verbal.length - 1 ? <>Next Question <ChevronRight className="w-4 h-4" /></> : <>Next Section <ChevronRight className="w-4 h-4" /></>}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
+        {section === 'Coding' && (() => {
+          const problem = oaData.Coding[oaCodingIndex];
+          const runResult = oaRunResults[oaCodingIndex];
+          if (!problem) return null;
+          return (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-gray-400">Problem {oaCodingIndex + 1}/{oaData.Coding.length}</p>
+              </div>
+              <div className="card space-y-2">
+                <h3 className="font-semibold text-white">{problem.title}</h3>
+                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">{problem.description}</p>
+                {problem.constraints && <p className="text-xs text-gray-500">Constraints: {problem.constraints}</p>}
+              </div>
+              <div className="rounded-xl overflow-hidden border border-white/10">
+                <Editor
+                  height="300px"
+                  language="javascript"
+                  theme="vs-dark"
+                  value={oaCode[oaCodingIndex] ?? problem.starterCode ?? ''}
+                  onChange={(val) => setOaCode(prev => ({ ...prev, [oaCodingIndex]: val ?? '' }))}
+                  options={{ minimap: { enabled: false }, fontSize: 13 }}
+                />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={runOACode} disabled={oaRunning} className="btn-primary flex items-center gap-2 disabled:opacity-50">
+                  {oaRunning ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Running...</> : <><Play className="w-4 h-4" /> Run Code</>}
+                </button>
+                <button onClick={() => oaCodingIndex < oaData.Coding.length - 1 ? setOaCodingIndex(i => i + 1) : advanceOASection()} className="btn-ghost text-sm">
+                  {oaCodingIndex < oaData.Coding.length - 1 ? 'Next Problem →' : 'Finish Assessment →'}
+                </button>
+              </div>
+              {runResult && (
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-400">{runResult.passedCount}/{runResult.totalCount} test cases passed</p>
+                  {runResult.results.filter(r => !r.hidden).map((r, ri) => (
+                    <div key={ri} className={`card text-xs space-y-1 border ${r.passed ? 'border-green-500/20' : 'border-red-500/20'}`}>
+                      <p className="text-gray-400">Input: <span className="text-gray-300">{r.input}</span></p>
+                      <p className="text-gray-400">Expected: <span className="text-gray-300">{r.expectedOutput}</span></p>
+                      <p className="text-gray-400">Got: <span className={r.passed ? 'text-green-400' : 'text-red-400'}>{r.actualOutput || '(no output)'}</span></p>
+                    </div>
+                  ))}
+                  <p className="text-xs text-gray-600">+ {runResult.results.filter(r => r.hidden).length} hidden test case(s)</p>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+      </div>
+    );
+  }
+
+  if (stage === STAGES.OA_RESULTS) {
+    const sectionScores = OA_SECTIONS.map(s => ({ section: s, ...oaSectionScore(s) }));
+    return (
+      <div className="space-y-5 animate-slide-up text-center max-w-lg mx-auto">
+        <div className="text-6xl">🏆</div>
+        <h1 className="text-3xl font-display font-bold text-white">Assessment Complete!</h1>
+        <div className="card space-y-4">
+          {sectionScores.map(s => (
+            <div key={s.section} className="flex items-center justify-between text-sm border-b border-white/5 pb-3 last:border-0 last:pb-0">
+              <span className="text-gray-400">{s.section}</span>
+              <span className="text-white font-semibold">{s.correct}/{s.total}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-3">
+          <button onClick={resetOA} className="btn-primary flex-1 flex items-center justify-center gap-2">
+            <RotateCcw className="w-4 h-4" /> Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (stage === STAGES.MCQ_RESULTS) return (
     <div className="space-y-5 animate-slide-up text-center max-w-lg mx-auto">
       <div className="text-6xl">🎯</div>
