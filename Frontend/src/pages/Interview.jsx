@@ -38,6 +38,19 @@ export default function Interview() {
   const [mcqAnswers, setMcqAnswers] = useState({});
   const [mcqLoading, setMcqLoading] = useState(false);
 
+  const [oaLoading, setOaLoading] = useState(false);
+  const [oaSectionIndex, setOaSectionIndex] = useState(0);
+  const [oaTimeLeft, setOaTimeLeft] = useState(0);
+  const [oaData, setOaData] = useState({ Aptitude: [], Reasoning: [], Verbal: [], Coding: [] });
+  const [oaAnswers, setOaAnswers] = useState({ Aptitude: {}, Reasoning: {}, Verbal: {}, Coding: {} });
+  const [oaCodingIndex, setOaCodingIndex] = useState(0);
+  const [oaCode, setOaCode] = useState({});
+  const [oaRunResults, setOaRunResults] = useState({});
+  const [oaRunning, setOaRunning] = useState(false);
+  const [oaVerbalIndex, setOaVerbalIndex] = useState(0);
+  const [oaVerbalEval, setOaVerbalEval] = useState({});
+  const [oaVerbalLoading, setOaVerbalLoading] = useState(false);
+
   const startInterview = async () => {
     if (!config.role) return toast.error('Please select a role');
     setLoading(true);
