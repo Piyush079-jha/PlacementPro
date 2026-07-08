@@ -385,4 +385,4 @@ Return JSON array:
   }
 });
 
-module.exports = router; "expectedOutput": "expected stdout
+module.exports = router;
