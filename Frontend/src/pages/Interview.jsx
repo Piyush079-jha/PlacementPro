@@ -309,54 +309,7 @@ export default function Interview() {
           </span>
         </button>
 
-        <button
-          onClick={() => { setMode('Verbal'); setConfig(p => ({ ...p, type: 'Verbal' })); setStage(STAGES.SETUP); }}
-          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
-        >
-          <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
-            <Languages className="w-5 h-5 text-primary-400" />
-          </div>
-          <h2 className="font-display font-semibold text-white text-lg">Verbal</h2>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            Comprehension, vocabulary, and communication-style questions with instant AI feedback.
-          </p>
-          <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
-            Start <ChevronRight className="w-4 h-4" />
-          </span>
-        </button>
-
-        <button
-          onClick={() => { setMcqCategory('Aptitude'); setStage(STAGES.MCQ_SETUP); }}
-          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
-        >
-          <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
-            <Brain className="w-5 h-5 text-primary-400" />
-          </div>
-          <h2 className="font-display font-semibold text-white text-lg">Aptitude</h2>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            Quant MCQs — percentages, time & work, series, and more — with instant right/wrong feedback.
-          </p>
-          <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
-            Start <ChevronRight className="w-4 h-4" />
-          </span>
-        </button>
-
-        <button
-          onClick={() => { setMcqCategory('Reasoning'); setStage(STAGES.MCQ_SETUP); }}
-          className="card text-left space-y-3 border border-white/10 hover:border-primary-500/30 transition-all group"
-        >
-          <div className="w-11 h-11 rounded-xl bg-primary-500/10 flex items-center justify-center group-hover:bg-primary-500/15 transition-colors">
-            <ListChecks className="w-5 h-5 text-primary-400" />
-          </div>
-          <h2 className="font-display font-semibold text-white text-lg">Reasoning</h2>
-          <p className="text-gray-500 text-sm leading-relaxed">
-            Logical MCQs — puzzles, series, blood relations, and more — with instant feedback.
-          </p>
-          <span className="inline-flex items-center gap-1 text-primary-400 text-sm font-medium pt-1">
-            Start <ChevronRight className="w-4 h-4" />
-          </span>
-        </button>
-      </div>
+        </div>
     </div>
   );
 
