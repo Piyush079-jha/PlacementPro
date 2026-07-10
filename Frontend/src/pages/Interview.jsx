@@ -146,21 +146,15 @@ export default function Interview() {
   const startOA = async () => {
     setOaLoading(true);
     try {
-      const results = await Promise.allSettled([
-        axios.post('/api/interview/mcq-questions', { category: 'Aptitude', difficulty: 'Medium', count: 10 }),
-        axios.post('/api/interview/mcq-questions', { category: 'Reasoning', difficulty: 'Medium', count: 10 }),
-        axios.post('/api/interview/questions', { role: 'Software Engineer', difficulty: 'Medium', count: 5, type: 'Verbal' }),
-        axios.post('/api/interview/coding-questions', { difficulty: 'Medium', count: 2, language: 'javascript' })
-      ]);
-      const labels = ['Aptitude', 'Reasoning', 'Verbal', 'Coding'];
-      const failed = results.filter(r => r.status === 'rejected');
-      if (failed.length) {
-        results.forEach((r, i) => {
-          if (r.status === 'rejected') console.error(`${labels[i]} generation failed:`, r.reason?.response?.data || r.reason?.message);
-        });
-        throw new Error(`Failed to generate: ${results.map((r,i)=>r.status==='rejected'?labels[i]:null).filter(Boolean).join(', ')}`);
-      }
-      const [aptRes, reaRes, verRes, codeRes] = results.map(r => r.value);
+      const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+      const aptRes = await axios.post('/api/interview/mcq-questions', { category: 'Aptitude', difficulty: 'Medium', count: 10 });
+      await delay(1500);
+      const reaRes = await axios.post('/api/interview/mcq-questions', { category: 'Reasoning', difficulty: 'Medium', count: 10 });
+      await delay(1500);
+      const verRes = await axios.post('/api/interview/questions', { role: 'Software Engineer', difficulty: 'Medium', count: 5, type: 'Verbal' });
+      await delay(1500);
+      const codeRes = await axios.post('/api/interview/coding-questions', { difficulty: 'Medium', count: 2, language: 'javascript' });
       setOaData({
         Aptitude: aptRes.data.questions,
         Reasoning: reaRes.data.questions,
