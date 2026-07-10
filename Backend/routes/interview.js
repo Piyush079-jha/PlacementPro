@@ -278,7 +278,7 @@ Return JSON array:
   }
 ]`;
 
-    const result = await callClaude(systemPrompt, userMessage, 1400);
+    const result = await callClaude(systemPrompt, userMessage, 2500);
     const questions = parseJSON(result);
     if (!questions) return res.status(500).json({ error: 'Failed to generate questions' });
 
