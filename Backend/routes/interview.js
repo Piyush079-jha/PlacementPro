@@ -268,6 +268,8 @@ Respond with valid JSON only.`;
     const randomTopic = topics[Math.floor(Math.random() * topics.length)];
 
     const userMessage = `Generate ${count} ${difficulty || 'Medium'} difficulty MCQ questions for ${category}, leaning toward "${randomTopic}" where natural, with variety across the set.
+IMPORTANT: never use double or single quote marks inside "question", "options", or "explanation" text (e.g. to emphasize a word) — this breaks JSON. Use plain text without quotation marks instead.
+`;
 ${category === 'Verbal' ? `If the question is a reading comprehension type, include a short passage (3-5 sentences) inside the "question" field before the actual question, clearly separated. For grammar/vocab types, keep the question self-contained without a passage.` : ''}
 Return JSON array:
 [
