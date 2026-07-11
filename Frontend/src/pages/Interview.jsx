@@ -705,6 +705,16 @@ export default function Interview() {
                 <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">{problem.description}</p>
                 {problem.constraints && <p className="text-xs text-gray-500">Constraints: {problem.constraints}</p>}
               </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs text-gray-500 mr-1">Language:</span>
+                {['javascript', 'python', 'java', 'cpp', 'c'].map(lang => (
+                  <button key={lang} onClick={() => changeOALanguage(lang)} disabled={oaLangLoading}
+                    className={`py-1.5 px-3 rounded-lg text-xs font-medium border transition-all disabled:opacity-50 ${oaLanguage === lang ? 'bg-primary-500 border-primary-500 text-white' : 'border-white/10 text-gray-400 hover:border-primary-500/30'}`}>
+                    {lang === 'javascript' ? 'JS' : lang === 'cpp' ? 'C++' : lang.charAt(0).toUpperCase() + lang.slice(1)}
+                  </button>
+                ))}
+                {oaLangLoading && <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+              </div>
               <div className="rounded-xl overflow-hidden border border-white/10">
                 <Editor
                   height="300px"
