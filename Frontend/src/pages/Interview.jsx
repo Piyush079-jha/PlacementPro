@@ -597,6 +597,17 @@ export default function Interview() {
             </div>
           ))}
         </div>
+        <div>
+          <label className="label">Coding Language</label>
+          <div className="grid grid-cols-5 gap-2">
+            {['javascript', 'python', 'java', 'cpp', 'c'].map(lang => (
+              <button key={lang} onClick={() => setOaLanguage(lang)}
+                className={`py-2 rounded-lg text-xs font-medium border transition-all ${oaLanguage === lang ? 'bg-primary-500 border-primary-500 text-white' : 'border-white/10 text-gray-400 hover:border-primary-500/30'}`}>
+                {lang === 'javascript' ? 'JS' : lang === 'cpp' ? 'C++' : lang.charAt(0).toUpperCase() + lang.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
         <p className="text-xs text-gray-600">Each section auto-submits and moves to the next when time runs out. You cannot go back to a previous section.</p>
         <button onClick={startOA} disabled={oaLoading} className="btn-primary w-full py-3 flex items-center justify-center gap-2 disabled:opacity-50">
           {oaLoading ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Preparing assessment...</> : <><Play className="w-4 h-4" /> Start Assessment</>}
