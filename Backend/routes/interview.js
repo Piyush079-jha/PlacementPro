@@ -251,8 +251,8 @@ router.post('/mcq-questions', auth, async (req, res) => {
   try {
     const { category, difficulty, count = 10 } = req.body;
     if (!category) return res.status(400).json({ error: 'Category is required' });
-    if (!['Aptitude', 'Reasoning'].includes(category)) {
-      return res.status(400).json({ error: 'Category must be Aptitude or Reasoning' });
+    if (!['Aptitude', 'Reasoning', 'Verbal'].includes(category)) {
+      return res.status(400).json({ error: 'Category must be Aptitude, Reasoning, or Verbal' });
     }
 
     const systemPrompt = `You are an expert question setter for Indian campus placement exams (like TCS, Infosys, Wipro, Capgemini aptitude tests).
