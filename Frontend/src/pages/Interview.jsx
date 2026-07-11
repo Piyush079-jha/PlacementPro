@@ -652,51 +652,26 @@ export default function Interview() {
           </div>
         )}
 
-        {section === 'Verbal' && (() => {
-          const q = oaData.Verbal[oaVerbalIndex];
-          const ev = oaVerbalEval[oaVerbalIndex];
-          if (!q) return null;
-          return (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-400">Question {oaVerbalIndex + 1}/{oaData.Verbal.length}</p>
-              </div>
-              <div className="card">
-                <p className="text-white text-lg leading-relaxed font-medium">{q.question}</p>
-              </div>
-              <textarea
-                className="input-field min-h-28 resize-none"
-                placeholder="Type your answer here..."
-                value={oaAnswers.Verbal[oaVerbalIndex] || ''}
-                onChange={e => setOaAnswers(prev => ({ ...prev, Verbal: { ...prev.Verbal, [oaVerbalIndex]: e.target.value } }))}
-                disabled={!!ev}
-              />
-              {!ev ? (
-                <div className="flex gap-3">
-                  <button onClick={evaluateOAVerbal} disabled={oaVerbalLoading} className="btn-primary flex items-center gap-2 disabled:opacity-50">
-                    {oaVerbalLoading ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Evaluating...</> : <><Zap className="w-4 h-4" /> Get Feedback</>}
-                  </button>
-                  <button onClick={() => oaVerbalIndex < oaData.Verbal.length - 1 ? setOaVerbalIndex(i => i + 1) : advanceOASection()} className="btn-ghost text-sm">
-                    Skip →
-                  </button>
+        {section === 'Verbal' && (
+          <div className="space-y-4">
+            {oaData.Verbal.map((q, i) => (
+              <div key={i} className="card space-y-3">
+                <p className="text-white font-medium text-sm whitespace-pre-line">{i + 1}. {q.question}</p>
+                <div className="space-y-2">
+                  {q.options.map((opt, oi) => (
+                    <button key={oi} onClick={() => selectOAMcqAnswer('Verbal', i, oi)}
+                      className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${oaAnswers.Verbal[i] === oi ? 'border-primary-500/50 bg-primary-500/10 text-primary-300' : 'border-white/10 text-gray-300 hover:border-primary-500/30'}`}>
+                      {opt}
+                    </button>
+                  ))}
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="card border border-primary-500/20">
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-semibold text-white text-sm">Feedback</h3>
-                      <ScoreBadge score={ev.score} />
-                    </div>
-                    <p className="text-gray-300 text-sm leading-relaxed">{ev.feedback}</p>
-                  </div>
-                  <button onClick={() => oaVerbalIndex < oaData.Verbal.length - 1 ? setOaVerbalIndex(i => i + 1) : advanceOASection()} className="btn-primary flex items-center gap-2">
-                    {oaVerbalIndex < oaData.Verbal.length - 1 ? <>Next Question <ChevronRight className="w-4 h-4" /></> : <>Next Section <ChevronRight className="w-4 h-4" /></>}
-                  </button>
-                </div>
-              )}
-            </div>
-          );
-        })()}
+              </div>
+            ))}
+            <button onClick={advanceOASection} className="btn-primary flex items-center gap-2">
+              Submit & Next Section <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {section === 'Coding' && (() => {
           const problem = oaData.Coding[oaCodingIndex];
