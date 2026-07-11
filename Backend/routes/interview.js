@@ -282,7 +282,10 @@ Return JSON array:
 
     const result = await callClaude(systemPrompt, userMessage, 2500);
     const questions = parseJSON(result);
-    if (!questions) return res.status(500).json({ error: 'Failed to generate questions' });
+    if (!questions) {
+      console.error('mcq-questions: failed to parse AI response:', result?.slice(0, 500));
+      return res.status(500).json({ error: 'Failed to generate questions' });
+    }
 
     res.json({ success: true, questions, category, difficulty });
   } catch (err) {
