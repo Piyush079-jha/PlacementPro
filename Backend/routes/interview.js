@@ -361,6 +361,9 @@ Respond with valid JSON only.`;
     const userMessage = `Generate ${count} ${difficulty || 'Medium'} difficulty coding problems, leaning toward "${randomTopic}" where natural.
 Each problem must be solvable by reading input from stdin and printing output to stdout (like a real OA judge).
 Provide 3 test cases per problem: 2 visible (hidden: false) and 1 hidden (hidden: true).
+
+IMPORTANT formatting rule for "starterCode": write it as properly indented, multi-line, human-readable ${language} code, exactly as it would appear in a code editor. Use real line breaks encoded as \\n escape sequences inside the JSON string (never a single-line/minified version). Include helpful comments like "// write your code here" where the candidate should fill in logic.
+
 Return JSON array:
 [
   {
@@ -368,7 +371,7 @@ Return JSON array:
     "title": "short problem title",
     "description": "full problem statement including input/output format",
     "constraints": "constraints text",
-    "starterCode": "function/template starter code for ${language} that reads stdin and prints stdout",
+    "starterCode": "multi-line, properly indented starter code for ${language} with \\n line breaks, that reads stdin and prints stdout",
     "testCases": [
       { "input": "stdin input text", "expectedOutput": "expected stdout text", "hidden": false },
       { "input": "stdin input text", "expectedOutput": "expected stdout text", "hidden": false },
