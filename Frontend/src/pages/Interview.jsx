@@ -212,7 +212,7 @@ export default function Interview() {
     if (!code.trim()) return toast.error('Please write some code first');
     setOaRunning(true);
     try {
-      const res = await axios.post('/api/interview/run-code', { code, language: 'javascript', testCases: problem.testCases });
+      const res = await axios.post('/api/interview/run-code', { code, language: oaLanguage, testCases: problem.testCases });
       setOaRunResults(prev => ({ ...prev, [oaCodingIndex]: res.data }));
       setOaAnswers(prev => ({ ...prev, Coding: { ...prev.Coding, [oaCodingIndex]: { code, passedCount: res.data.passedCount, totalCount: res.data.totalCount } } }));
       if (res.data.allPassed) toast.success('All test cases passed!');
@@ -692,7 +692,7 @@ export default function Interview() {
               <div className="rounded-xl overflow-hidden border border-white/10">
                 <Editor
                   height="300px"
-                  language="javascript"
+                  language={oaLanguage === 'cpp' ? 'cpp' : oaLanguage}
                   theme="vs-dark"
                   value={oaCode[oaCodingIndex] ?? problem.starterCode ?? ''}
                   onChange={(val) => setOaCode(prev => ({ ...prev, [oaCodingIndex]: val ?? '' }))}
