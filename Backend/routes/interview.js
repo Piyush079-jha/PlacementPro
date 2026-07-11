@@ -384,6 +384,19 @@ Return JSON array:
     const questions = parseJSON(result);
     if (!questions) return res.status(500).json({ error: 'Failed to generate coding questions' });
 
+  
+    questions.forEach(q => {
+      if (q.starterCode) {
+        q.starterCode = q.starterCode.replace(/\\n/g, '\n');
+        if (!q.starterCode.includes('\n') && q.starterCode.length > 80) {
+          q.starterCode = q.starterCode
+            .replace(/;\s*/g, ';\n')
+            .replace(/\{\s*/g, '{\n')
+            .replace(/\}\s*/g, '\n}\n');
+        }
+      }
+    });
+
     res.json({ success: true, questions, difficulty });
   } catch (err) {
     res.status(500).json({ error: err.message });
