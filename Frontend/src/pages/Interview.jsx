@@ -47,9 +47,9 @@ export default function Interview() {
   const [oaCode, setOaCode] = useState({});
   const [oaRunResults, setOaRunResults] = useState({});
   const [oaRunning, setOaRunning] = useState(false);
-  const [oaVerbalIndex, setOaVerbalIndex] = useState(0);
-  const [oaVerbalEval, setOaVerbalEval] = useState({});
-  const [oaVerbalLoading, setOaVerbalLoading] = useState(false);
+  // const [oaVerbalIndex, setOaVerbalIndex] = useState(0);
+  // const [oaVerbalEval, setOaVerbalEval] = useState({});
+  // const [oaVerbalLoading, setOaVerbalLoading] = useState(false);
 
   const startInterview = async () => {
     if (!config.role) return toast.error('Please select a role');
@@ -164,10 +164,8 @@ export default function Interview() {
       setOaAnswers({ Aptitude: {}, Reasoning: {}, Verbal: {}, Coding: {} });
       setOaCode(Object.fromEntries(codeRes.data.questions.map((q, i) => [i, q.starterCode || ''])));
       setOaRunResults({});
-      setOaVerbalEval({});
       setOaSectionIndex(0);
       setOaCodingIndex(0);
-      setOaVerbalIndex(0);
       setOaTimeLeft(OA_SECTION_TIME[OA_SECTIONS[0]]);
       setStage(STAGES.OA_ACTIVE);
     } catch (err) {
@@ -183,7 +181,6 @@ export default function Interview() {
       setOaSectionIndex(next);
       setOaTimeLeft(OA_SECTION_TIME[OA_SECTIONS[next]]);
       setOaCodingIndex(0);
-      setOaVerbalIndex(0);
     } else {
       setStage(STAGES.OA_RESULTS);
     }
@@ -193,20 +190,20 @@ export default function Interview() {
     setOaAnswers(prev => ({ ...prev, [section]: { ...prev[section], [qIndex]: optionIndex } }));
   };
 
-  const evaluateOAVerbal = async () => {
-    const q = oaData.Verbal[oaVerbalIndex];
-    const answer = oaAnswers.Verbal[oaVerbalIndex];
-    if (!answer?.trim() || answer.trim().length < 10) return toast.error('Please write a proper answer (at least 10 characters)');
-    setOaVerbalLoading(true);
-    try {
-      const res = await axios.post('/api/interview/evaluate', { question: q.question, answer, role: 'Software Engineer', type: 'Verbal' });
-      setOaVerbalEval(prev => ({ ...prev, [oaVerbalIndex]: res.data.evaluation }));
-    } catch (err) {
-      toast.error(err.response?.data?.error || 'Evaluation failed');
-    } finally {
-      setOaVerbalLoading(false);
-    }
-  };
+  // const evaluateOAVerbal = async () => {
+  //   const q = oaData.Verbal[oaVerbalIndex];
+  //   const answer = oaAnswers.Verbal[oaVerbalIndex];
+  //   if (!answer?.trim() || answer.trim().length < 10) return toast.error('Please write a proper answer (at least 10 characters)');
+  //   setOaVerbalLoading(true);
+  //   try {
+  //     const res = await axios.post('/api/interview/evaluate', { question: q.question, answer, role: 'Software Engineer', type: 'Verbal' });
+  //     setOaVerbalEval(prev => ({ ...prev, [oaVerbalIndex]: res.data.evaluation }));
+  //   } catch (err) {
+  //     toast.error(err.response?.data?.error || 'Evaluation failed');
+  //   } finally {
+  //     setOaVerbalLoading(false);
+  //   }
+  // };
 
   const runOACode = async () => {
     const problem = oaData.Coding[oaCodingIndex];
@@ -245,9 +242,7 @@ export default function Interview() {
     setOaAnswers({ Aptitude: {}, Reasoning: {}, Verbal: {}, Coding: {} });
     setOaSectionIndex(0);
     setOaCodingIndex(0);
-    setOaVerbalIndex(0);
     setOaRunResults({});
-    setOaVerbalEval({});
   };
 
   const avgScore = () => {
