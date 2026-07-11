@@ -362,7 +362,7 @@ Respond with valid JSON only.`;
 Each problem must be solvable by reading input from stdin and printing output to stdout (like a real OA judge).
 Provide 3 test cases per problem: 2 visible (hidden: false) and 1 hidden (hidden: true).
 
-IMPORTANT formatting rule for "starterCode": write it as properly indented, multi-line, human-readable ${language} code, exactly as it would appear in a code editor. Use real line breaks encoded as \\n escape sequences inside the JSON string (never a single-line/minified version). Include helpful comments like "// write your code here" where the candidate should fill in logic.
+IMPORTANT formatting rule for "starterCode": write it as properly indented, multi-line, human-readable ${language} code, exactly as it would appear in a code editor (never a single-line/minified version). Include helpful comments like "// write your code here" where the candidate should fill in logic.
 
 Return JSON array:
 [
@@ -382,7 +382,10 @@ Return JSON array:
 
     const result = await callClaude(systemPrompt, userMessage, 3000);
     const questions = parseJSON(result);
-    if (!questions) return res.status(500).json({ error: 'Failed to generate coding questions' });
+    if (!questions) {
+      console.error('coding-questions: failed to parse AI response:', result?.slice(0, 500));
+      return res.status(500).json({ error: 'Failed to generate coding questions' });
+    }
 
   
     questions.forEach(q => {
@@ -398,6 +401,30 @@ Return JSON array:
     });
 
     res.json({ success: true, questions, difficulty });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get starter code for a specific language for an already-generated coding problem
+router.post('/starter-code', auth, async (req, res) => {
+  try {
+    const { title, description, language } = req.body;
+    if (!title || !description || !language) return res.status(400).json({ error: 'title, description, and language are required' });
+
+    const systemPrompt = `You write clean, properly indented, multi-line starter code templates for coding problems. Respond with valid JSON only.`;
+    const userMessage = `Problem: "${title}"
+${description}
+
+Write starter code in ${language} that reads input from stdin and prints output to stdout, matching this problem. Include a comment like "// write your code here" for the candidate to fill in.
+Return JSON:
+{ "starterCode": "properly indented, multi-line ${language} starter code" }`;
+
+    const result = await callClaude(systemPrompt, userMessage, 800);
+    const parsed = parseJSON(result);
+    if (!parsed?.starterCode) return res.status(500).json({ error: 'Failed to generate starter code' });
+
+    res.json({ success: true, starterCode: parsed.starterCode });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
