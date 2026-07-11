@@ -261,7 +261,8 @@ Respond with valid JSON only.`;
 
     const topicsByCategory = {
       Aptitude: ['percentages', 'profit and loss', 'time and work', 'time speed distance', 'ratio and proportion', 'averages', 'simple and compound interest', 'number series', 'permutations and combinations', 'probability'],
-      Reasoning: ['blood relations', 'coding-decoding', 'syllogisms', 'seating arrangement', 'direction sense', 'series completion', 'analogies', 'statement and conclusion', 'clock and calendar', 'puzzles']
+      Reasoning: ['blood relations', 'coding-decoding', 'syllogisms', 'seating arrangement', 'direction sense', 'series completion', 'analogies', 'statement and conclusion', 'clock and calendar', 'puzzles'],
+      Verbal: ['synonyms and antonyms', 'error spotting / spot the grammatical error', 'sentence correction', 'para-jumbles', 'reading comprehension', 'fill in the blanks', 'one word substitution', 'idioms and phrases', 'sentence completion', 'active-passive and direct-indirect speech']
     };
     const topics = topicsByCategory[category];
     const randomTopic = topics[Math.floor(Math.random() * topics.length)];
