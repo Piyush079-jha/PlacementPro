@@ -208,6 +208,31 @@ export default function Interview() {
   //   }
   // };
 
+  const changeOALanguage = async (lang) => {
+    if (lang === oaLanguage) return;
+    setOaLanguage(lang);
+    const problem = oaData.Coding[oaCodingIndex];
+    if (!problem) return;
+
+    const cached = oaStarterCodeCache[oaCodingIndex]?.[lang];
+    if (cached != null) {
+      setOaCode(prev => ({ ...prev, [oaCodingIndex]: cached }));
+      return;
+    }
+
+    setOaLangLoading(true);
+    try {
+      const res = await axios.post('/api/interview/starter-code', { title: problem.title, description: problem.description, language: lang });
+      const code = res.data.starterCode;
+      setOaStarterCodeCache(prev => ({ ...prev, [oaCodingIndex]: { ...(prev[oaCodingIndex] || {}), [lang]: code } }));
+      setOaCode(prev => ({ ...prev, [oaCodingIndex]: code }));
+    } catch (err) {
+      toast.error('Failed to load starter code for this language');
+    } finally {
+      setOaLangLoading(false);
+    }
+  };
+
   const runOACode = async () => {
     const problem = oaData.Coding[oaCodingIndex];
     const code = oaCode[oaCodingIndex] || '';
