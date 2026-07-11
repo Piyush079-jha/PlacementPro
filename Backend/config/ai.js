@@ -32,22 +32,30 @@ async function callClaude(systemPrompt, userMessage, maxTokens = 1500) {
   return data.choices[0].message.content;
 }
 
+const { jsonrepair } = require('jsonrepair');
+
 function parseJSON(text) {
   try {
     // Try direct parse first
     return JSON.parse(text.trim());
   } catch {}
 
+  const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+
   try {
-    // Strip markdown code fences
-    const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
     return JSON.parse(cleaned);
   } catch {}
 
+  // Fallback: attempt to auto-repair common AI JSON issues
+  // (unescaped quotes inside string values, trailing commas, etc.)
   try {
-    // Extract first JSON object found anywhere in the text
-    const match = text.match(/\{[\s\S]*\}/);
-    if (match) return JSON.parse(match[0]);
+    return JSON.parse(jsonrepair(cleaned));
+  } catch {}
+
+  try {
+    // Extract first JSON structure found anywhere in the text, then repair it
+    const match = cleaned.match(/[\{\[][\s\S]*[\}\]]/);
+    if (match) return JSON.parse(jsonrepair(match[0]));
   } catch {}
 
   return null;
