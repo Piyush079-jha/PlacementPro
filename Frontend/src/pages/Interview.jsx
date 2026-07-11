@@ -47,6 +47,7 @@ export default function Interview() {
   const [oaCode, setOaCode] = useState({});
   const [oaRunResults, setOaRunResults] = useState({});
   const [oaRunning, setOaRunning] = useState(false);
+  const [oaLanguage, setOaLanguage] = useState('javascript');
   // const [oaVerbalIndex, setOaVerbalIndex] = useState(0);
   // const [oaVerbalEval, setOaVerbalEval] = useState({});
   // const [oaVerbalLoading, setOaVerbalLoading] = useState(false);
