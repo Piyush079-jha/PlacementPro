@@ -152,7 +152,7 @@ export default function Interview() {
       await delay(1500);
       const reaRes = await axios.post('/api/interview/mcq-questions', { category: 'Reasoning', difficulty: 'Medium', count: 10 });
       await delay(1500);
-      const verRes = await axios.post('/api/interview/questions', { role: 'Software Engineer', difficulty: 'Medium', count: 5, type: 'Verbal' });
+      const verRes = await axios.post('/api/interview/mcq-questions', { category: 'Verbal', difficulty: 'Medium', count: 10 });
       await delay(1500);
       const codeRes = await axios.post('/api/interview/coding-questions', { difficulty: 'Medium', count: 2, language: 'javascript' });
       setOaData({
