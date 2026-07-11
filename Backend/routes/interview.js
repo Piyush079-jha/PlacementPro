@@ -280,10 +280,10 @@ Return JSON array:
   }
 ]`;
 
-    const result = await callClaude(systemPrompt, userMessage, 2500);
+    const result = await callClaude(systemPrompt, userMessage, 4000);
     const questions = parseJSON(result);
     if (!questions) {
-      console.error('mcq-questions: failed to parse AI response:', result?.slice(0, 500));
+      console.error('mcq-questions: failed to parse AI response (likely truncated):', result?.slice(-300));
       return res.status(500).json({ error: 'Failed to generate questions' });
     }
 
