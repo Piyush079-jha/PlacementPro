@@ -283,7 +283,10 @@ Return JSON array:
     const result = await callClaude(systemPrompt, userMessage, 4000);
     const questions = parseJSON(result);
     if (!questions) {
-      console.error('mcq-questions: failed to parse AI response (likely truncated):', result?.slice(-300));
+      const fs = require('fs');
+      const debugPath = require('path').join(__dirname, '..', 'debug-mcq-fail.txt');
+      fs.writeFileSync(debugPath, result || '(empty response)');
+      console.error(`mcq-questions: failed to parse AI response. Full response written to ${debugPath}`);
       return res.status(500).json({ error: 'Failed to generate questions' });
     }
 
