@@ -48,6 +48,8 @@ export default function Interview() {
   const [oaRunResults, setOaRunResults] = useState({});
   const [oaRunning, setOaRunning] = useState(false);
   const [oaLanguage, setOaLanguage] = useState('javascript');
+  const [oaStarterCodeCache, setOaStarterCodeCache] = useState({}); // { [problemIndex]: { [language]: code } }
+  const [oaLangLoading, setOaLangLoading] = useState(false);
   // const [oaVerbalIndex, setOaVerbalIndex] = useState(0);
   // const [oaVerbalEval, setOaVerbalEval] = useState({});
   // const [oaVerbalLoading, setOaVerbalLoading] = useState(false);
