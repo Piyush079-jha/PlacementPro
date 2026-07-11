@@ -234,11 +234,6 @@ export default function Interview() {
       const totalCases = entries.reduce((sum, e) => sum + (e.totalCount || 0), 0);
       return { correct: totalPassed, total: totalCases };
     }
-    if (section === 'Verbal') {
-      const scores = Object.values(oaVerbalEval).map(e => e?.score).filter(s => s != null);
-      const avg = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-      return { correct: avg, total: 10 };
-    }
     let correct = 0;
     oaData[section].forEach((q, i) => { if (oaAnswers[section][i] === q.correctIndex) correct++; });
     return { correct, total: oaData[section].length };
