@@ -673,7 +673,7 @@ export default function Interview() {
               <span key={s} className={`badge text-xs ${i === oaSectionIndex ? 'bg-primary-500/20 text-primary-300 border border-primary-500/30' : i < oaSectionIndex ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-gray-600'}`}>{s}</span>
             ))}
           </div>
-          <div className={`flex items-center gap-1.5 font-mono text-sm ${oaTimeLeft <= 30 ? 'text-red-400' : 'text-gray-300'}`}>
+          <div className={`flex items-center gap-1.5 font-mono text-sm ${oaTimeLeft <= 30 ? 'text-red-400' : oaTimeLeft <= 60 ? 'text-yellow-400' : 'text-gray-300'}`}>
             <Clock className="w-4 h-4" /> {formatTime(oaTimeLeft)}
           </div>
         </div>
