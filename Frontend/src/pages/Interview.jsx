@@ -700,10 +700,10 @@ export default function Interview() {
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-400">Problem {oaCodingIndex + 1}/{oaData.Coding.length}</p>
               </div>
-              <div className="card space-y-2">
-                <h3 className="font-semibold text-white">{problem.title}</h3>
-                <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-line">{problem.description}</p>
-                {problem.constraints && <p className="text-xs text-gray-500">Constraints: {problem.constraints}</p>}
+              <div className="card space-y-3 p-6">
+                <h3 className="font-semibold text-white text-lg">{problem.title}</h3>
+                <p className="text-gray-300 text-base leading-relaxed whitespace-pre-line">{problem.description}</p>
+                {problem.constraints && <p className="text-sm text-gray-500">Constraints: {problem.constraints}</p>}
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-xs text-gray-500 mr-1">Language:</span>
