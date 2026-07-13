@@ -1,0 +1,74 @@
+[
+  {
+    "id": "q1",
+    "question": How many strings can be formed using the letters in the word PERMUTATIONS where each string has exactly 3 distinct letters?,
+    "options": [45, 36, 55, 60],
+    "correctIndex": 1,
+    "explanation": Use permutation formula to find the number of possible combinations of 3 distinct letters from the set {P,E,R,M,U,T,A,I,O,N,S} which is denoted by ^25C_3 = 25!/(22!*3!)
+  },
+  {
+    "id": "q2",
+    "question": In a class of 50 students, 20 students are girls.  7 groups of 5 students each are to be selected. How many groups will have at least one girl?,
+    "options": [25, 34, 45, 28],
+    "correctIndex": 0,
+    "explanation": Use complementary counting by finding the total number of groups (which is ^50C_5) and subtracting the number of groups with all boys (^30C_5)
+  },
+  {
+    "id": "q3",
+    "question": A bag contains 3 blue balls, 5 red balls and 2 yellow balls. If 4 balls are selected randomly in a certain order, what is the probability that exactly one of these balls is yellow?,
+    "options": [0.12, 0.11, 0.09, 0.08],
+    "correctIndex": 2,
+    "explanation": Use permutation formula with combinations in each case and then find the probability of each case (1 yellow in 3 other yellow balls and 3 other none yellow balls) and add them up
+  },
+  {
+    "id": "q4",
+    "question": From 4 men and 3 women 6 candidates are to be selected to form a team. In how many ways can it be possible without repetition and the order of selecting the members does not matter,
+    "options": [420, 540, 840, 1260],
+    "correctIndex": 0,
+    "explanation": Use permutations with combination formula to find the number of ways of selecting candidates
+  },
+  {
+    "id": "q5",
+    "question": A deck of cards has 12 cards with 4 cards of each rank (Ace to King). In how many ways can we choose two cards each of four different ranks, and one card such that the order in which we choose them matters?,
+    "options": [1440, 2880, 2880, 1440],
+    "correctIndex": 2,
+    "explanation": Use product rule to find the total number of ways of choosing cards
+  },
+  {
+    "id": "q6",
+    "question": How many ordered quintuples of integers are there which satisfy the equation (a + 6)(b + 6)(c + 6)(d + 6)(e + 6)= 256 * 27 (mod 5)? ,
+    "options": [1020, 1000, 1025, 1050],
+    "correctIndex": 2,
+    "explanation": First convert 256 * 27 mod 5 = 1, and let x be the value (a+6), (b+6), (c+6), (d+6) and (e+6) for that, as they are distinct. We need 5 numbers x with |x - 6| is divisible by 5. 
+So our x will be in the form of 5a, 5a + 5, 5a + 10, 5a + 15 and 5a + 20, Now, if a = 3 then x = 15, 20, 25, 30, and 35. 
+Thus a is fixed and x must be any of 15, 20, 25, 30 and 35. But as a is distinct we have 5! = 120 quintuples in total.
+  },
+  {
+    "id": "q7",
+    "question": In an election, five contestants received the following votes: the contestant A got 25 votes, contestant B got 27 votes, contestant C got 30 votes and contestant D and E each got half of the remaining votes. How many ways are there to elect a 3 member committee that includes neither D nor E as its member?,
+    "options": [60, 50, 65, 45],
+    "correctIndex": 2,
+    "explanation": Find number of ways to choose 3 contestant from {A,B,C} and the rest 2 are to be filled from 4 contestant left and the order in which they are chosen matters.
+  },
+  {
+    "id": "q8",
+    "question": How many three-letter word with capital letters can be formed if there are no letter repeated and there are 4 possible letters A E R for each of the 3 places,
+    "options": [12, 20, 24, 48],
+    "correctIndex": 0,
+    "explanation": Since no letters can be repeated in any of the words and there are 4 choices of letters in 3 positions, the number of possible words can be found using the product rule
+  },
+  {
+    "id": "q9",
+    "question": In a class there are total 25 students, if in a group of students 5 students are to be selected without repetition, and the order of selecting the students does not matter, and 5 groups of 5 students are to be created from the groups of 25 students, how many ways can the groups be created?,
+    "options": [5290, 5260, 5430, 5298],
+    "correctIndex": 0,
+    "explanation": We need to find number of combination of students from 25 students where 5 groups of 5 students can be created without repetition
+  },
+  {
+    "id": "q10",
+    "question": If there are 4 men and 2 women in the room and 2 people are to be selected to meet at 5.30. In how many ways can two people be selected for the meeting at 5.30, such that they are either both men or one man and one woman,
+    "options": [30, 22, 24, 35],
+    "correctIndex": 2,
+    "explanation": First find number of ways of selecting 2 people from 4 other people (men) which is ^4C_2, and secondly find number of ways of selecting 2 people from 6 other people (men and women) without repetition and the order in which they are chosen matters
+  }
+]

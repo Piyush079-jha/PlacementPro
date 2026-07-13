@@ -387,10 +387,13 @@ Return JSON array:
   }
 ]`;
 
-    const result = await callClaude(systemPrompt, userMessage, 3000);
+    const result = await callClaude(systemPrompt, userMessage, 6000);
     const questions = parseJSON(result);
     if (!questions) {
-      console.error('coding-questions: failed to parse AI response:', result?.slice(0, 500));
+      const fs = require('fs');
+      const debugPath = require('path').join(__dirname, '..', 'debug-coding-fail.txt');
+      fs.writeFileSync(debugPath, result || '(empty response)');
+      console.error(`coding-questions: failed to parse AI response. Full response written to ${debugPath}`);
       return res.status(500).json({ error: 'Failed to generate coding questions' });
     }
 
