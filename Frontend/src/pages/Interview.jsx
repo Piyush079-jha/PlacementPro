@@ -332,6 +332,12 @@ export default function Interview() {
     return () => window.removeEventListener('beforeunload', handler);
   }, [stage]);
 
+  useEffect(() => {
+    if (stage !== STAGES.OA_ACTIVE) return;
+    const payload = { oaData, oaAnswers, oaSectionIndex, oaTimeLeft, oaCodingIndex, oaCode, oaRunResults, oaLanguage, oaStarterCodeCache };
+    try { localStorage.setItem(OA_STORAGE_KEY, JSON.stringify(payload)); } catch {}
+  }, [stage, oaData, oaAnswers, oaSectionIndex, oaTimeLeft, oaCodingIndex, oaCode, oaRunResults, oaLanguage, oaStarterCodeCache]);
+
   const formatTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   /* ── MODE PICKER ── */
