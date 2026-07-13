@@ -304,6 +304,16 @@ export default function Interview() {
     return () => clearInterval(timer);
   }, [stage, oaTimeLeft, oaSectionIndex]);
 
+  useEffect(() => {
+    if (stage !== STAGES.OA_ACTIVE) return;
+    const handler = (e) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [stage]);
+
   const formatTime = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
   /* ── MODE PICKER ── */
@@ -683,7 +693,7 @@ export default function Interview() {
                 </div>
               </div>
             ))}
-            <button onClick={advanceOASection} className="btn-primary flex items-center gap-2">
+            <button onClick={() => confirmAdvanceSection(section)} className="btn-primary flex items-center gap-2">
               {oaSectionIndex < OA_SECTIONS.length - 1 ? <>Submit & Next Section <ChevronRight className="w-4 h-4" /></> : <>Finish Assessment <CheckCircle className="w-4 h-4" /></>}
             </button>
           </div>
@@ -704,7 +714,7 @@ export default function Interview() {
                 </div>
               </div>
             ))}
-            <button onClick={advanceOASection} className="btn-primary flex items-center gap-2">
+            <button onClick={() => confirmAdvanceSection('Verbal')} className="btn-primary flex items-center gap-2">
               Submit & Next Section <ChevronRight className="w-4 h-4" />
             </button>
           </div>
