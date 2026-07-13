@@ -55,16 +55,16 @@ export default function Interview() {
   const [mcqLoading, setMcqLoading] = useState(false);
 
   const [oaLoading, setOaLoading] = useState(false);
-  const [oaSectionIndex, setOaSectionIndex] = useState(0);
-  const [oaTimeLeft, setOaTimeLeft] = useState(0);
-  const [oaData, setOaData] = useState({ Aptitude: [], Reasoning: [], Verbal: [], Coding: [] });
-  const [oaAnswers, setOaAnswers] = useState({ Aptitude: {}, Reasoning: {}, Verbal: {}, Coding: {} });
-  const [oaCodingIndex, setOaCodingIndex] = useState(0);
-  const [oaCode, setOaCode] = useState({});
-  const [oaRunResults, setOaRunResults] = useState({});
+  const [oaSectionIndex, setOaSectionIndex] = useState(savedOA?.oaSectionIndex ?? 0);
+  const [oaTimeLeft, setOaTimeLeft] = useState(savedOA?.oaTimeLeft ?? 0);
+  const [oaData, setOaData] = useState(savedOA?.oaData ?? { Aptitude: [], Reasoning: [], Verbal: [], Coding: [] });
+  const [oaAnswers, setOaAnswers] = useState(savedOA?.oaAnswers ?? { Aptitude: {}, Reasoning: {}, Verbal: {}, Coding: {} });
+  const [oaCodingIndex, setOaCodingIndex] = useState(savedOA?.oaCodingIndex ?? 0);
+  const [oaCode, setOaCode] = useState(savedOA?.oaCode ?? {});
+  const [oaRunResults, setOaRunResults] = useState(savedOA?.oaRunResults ?? {});
   const [oaRunning, setOaRunning] = useState(false);
-  const [oaLanguage, setOaLanguage] = useState('javascript');
-  const [oaStarterCodeCache, setOaStarterCodeCache] = useState({}); // { [problemIndex]: { [language]: code } }
+  const [oaLanguage, setOaLanguage] = useState(savedOA?.oaLanguage ?? 'javascript');
+  const [oaStarterCodeCache, setOaStarterCodeCache] = useState(savedOA?.oaStarterCodeCache ?? {}); // { [problemIndex]: { [language]: code } }
   const [oaLangLoading, setOaLangLoading] = useState(false);
   // const [oaVerbalIndex, setOaVerbalIndex] = useState(0);
   // const [oaVerbalEval, setOaVerbalEval] = useState({});
