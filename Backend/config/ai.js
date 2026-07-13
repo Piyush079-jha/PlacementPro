@@ -77,11 +77,9 @@ async function callClaude(systemPrompt, userMessage, maxTokens = 1500, tier = 'f
     } catch (err) {
       lastError = err;
       if (err.isRateLimit) {
-        // Rotating to the next key already happens via nextKey() on retry.
-        // Only sleep if we've cycled through all keys once (they're all likely limited).
-        if (attempt > 0 && attempt % GROQ_KEYS.length === GROQ_KEYS.length - 1) {
-          await sleep(err.retryAfterMs);
-        }
+        // All keys share the same org-level TPM limit, so rotating keys doesn't
+        // help — always wait out the server-specified retry delay before retrying.
+        await sleep(err.retryAfterMs);
         continue;
       }
       throw err; // non-rate-limit errors fail immediately

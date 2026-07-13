@@ -387,7 +387,7 @@ Return JSON array:
   }
 ]`;
 
-    const result = await callClaude(systemPrompt, userMessage, 6000);
+    const result = await callClaude(systemPrompt, userMessage, 3500);
     const questions = parseJSON(result);
     if (!questions) {
       const fs = require('fs');
