@@ -715,19 +715,28 @@ export default function Interview() {
 
         {section === 'Verbal' && (
           <div className="space-y-4">
-            {oaData.Verbal.map((q, i) => (
-              <div key={i} className="card space-y-3">
-                <p className="text-white font-medium text-sm whitespace-pre-line">{i + 1}. {q.question}</p>
-                <div className="space-y-2">
-                  {q.options.map((opt, oi) => (
-                    <button key={oi} onClick={() => selectOAMcqAnswer('Verbal', i, oi)}
-                      className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${oaAnswers.Verbal[i] === oi ? 'border-primary-500/50 bg-primary-500/10 text-primary-300' : 'border-white/10 text-gray-300 hover:border-primary-500/30'}`}>
-                      {opt}
-                    </button>
-                  ))}
+            {oaData.Verbal.map((q, i) => {
+              const hasPassage = q.question.includes('|||');
+              const [passage, actualQuestion] = hasPassage ? q.question.split('|||') : [null, q.question];
+              return (
+                <div key={i} className="card space-y-3">
+                  {passage && (
+                    <div className="bg-white/3 border border-white/10 rounded-lg p-3">
+                      <p className="text-gray-400 text-xs italic leading-relaxed whitespace-pre-line">{passage.trim()}</p>
+                    </div>
+                  )}
+                  <p className="text-white font-medium text-sm whitespace-pre-line">{i + 1}. {actualQuestion.trim()}</p>
+                  <div className="space-y-2">
+                    {q.options.map((opt, oi) => (
+                      <button key={oi} onClick={() => selectOAMcqAnswer('Verbal', i, oi)}
+                        className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${oaAnswers.Verbal[i] === oi ? 'border-primary-500/50 bg-primary-500/10 text-primary-300' : 'border-white/10 text-gray-300 hover:border-primary-500/30'}`}>
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             <button onClick={() => confirmAdvanceSection('Verbal')} className="btn-primary flex items-center gap-2">
               Submit & Next Section <ChevronRight className="w-4 h-4" />
             </button>
