@@ -14,14 +14,30 @@ const STAGES = { MODE: 'mode', SETUP: 'setup', VIDEO_SETUP: 'video_setup', ACTIV
 const OA_SECTIONS = ['Aptitude', 'Reasoning', 'Verbal', 'Coding'];
 const OA_SECTION_TIME = { Aptitude: 10 * 60, Reasoning: 10 * 60, Verbal: 8 * 60, Coding: 20 * 60 }; // seconds
 
+const OA_STORAGE_KEY = 'oa_progress_v1';
+
+const loadOAProgress = () => {
+  try {
+    const raw = localStorage.getItem(OA_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const clearOAProgress = () => {
+  try { localStorage.removeItem(OA_STORAGE_KEY); } catch {}
+};
+
 const ScoreBadge = ({ score }) => {
   const color = score >= 8 ? 'text-green-400 bg-green-500/10 border-green-500/20' : score >= 6 ? 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' : 'text-red-400 bg-red-500/10 border-red-500/20';
   return <span className={`badge ${color} text-base font-bold`}>{score}/10</span>;
 };
 
 export default function Interview() {
+  const savedOA = loadOAProgress();
   const [config, setConfig] = useState({ role: '', difficulty: 'Medium', count: 5, type: 'mixed' });
-  const [stage, setStage] = useState(STAGES.MODE);
+  const [stage, setStage] = useState(savedOA ? STAGES.OA_ACTIVE : STAGES.MODE);
   const [questions, setQuestions] = useState([]);
   const [currentQ, setCurrentQ] = useState(0);
   const [answers, setAnswers] = useState({});
