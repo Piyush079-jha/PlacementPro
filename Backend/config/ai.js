@@ -2,12 +2,13 @@ const fetch = require('node-fetch');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
-// Comma-separated list in .env, e.g. GROQ_API_KEYS=key1,key2,key3
-// Falls back to single GROQ_API_KEY if that's all you have.
-const GROQ_KEYS = (process.env.GROQ_API_KEYS || process.env.GROQ_API_KEY || '')
-  .split(',')
-  .map(k => k.trim())
-  .filter(Boolean);
+// Reads GROQ_API_KEY, GROQ_API_KEY_02, GROQ_API_KEY_03, GROQ_API_KEY_04 from .env
+const GROQ_KEYS = [
+  process.env.GROQ_API_KEY,
+  process.env.GROQ_API_KEY_02,
+  process.env.GROQ_API_KEY_03,
+  process.env.GROQ_API_KEY_04
+].filter(Boolean);
 
 let keyCursor = 0;
 const nextKey = () => {
