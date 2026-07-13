@@ -178,6 +178,17 @@ export default function Interview() {
     }
   };
 
+  const confirmAdvanceSection = (section) => {
+    if (section === 'Coding') { advanceOASection(); return; }
+    const total = oaData[section]?.length || 0;
+    const answered = Object.keys(oaAnswers[section] || {}).length;
+    if (answered < total) {
+      const proceed = window.confirm(`You've answered ${answered}/${total} questions in ${section}. Submit anyway?`);
+      if (!proceed) return;
+    }
+    advanceOASection();
+  };
+
   const advanceOASection = () => {
     if (oaSectionIndex < OA_SECTIONS.length - 1) {
       const next = oaSectionIndex + 1;
