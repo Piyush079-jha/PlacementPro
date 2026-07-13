@@ -233,6 +233,14 @@ export default function Interview() {
     }
   };
 
+  const resetToStarterCode = () => {
+    const problem = oaData.Coding[oaCodingIndex];
+    if (!problem) return;
+    const original = oaStarterCodeCache[oaCodingIndex]?.[oaLanguage] ?? problem.starterCode ?? '';
+    setOaCode(prev => ({ ...prev, [oaCodingIndex]: original }));
+    toast.success('Code reset to starter template');
+  };
+
   const runOACode = async () => {
     const problem = oaData.Coding[oaCodingIndex];
     const code = oaCode[oaCodingIndex] || '';
