@@ -212,6 +212,7 @@ export default function Interview() {
       setOaTimeLeft(OA_SECTION_TIME[OA_SECTIONS[next]]);
       setOaCodingIndex(0);
     } else {
+      clearOAProgress();
       setStage(STAGES.OA_RESULTS);
     }
   };
