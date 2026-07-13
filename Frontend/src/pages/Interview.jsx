@@ -700,58 +700,67 @@ export default function Interview() {
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-400">Problem {oaCodingIndex + 1}/{oaData.Coding.length}</p>
               </div>
-              <div className="card space-y-3 p-6">
-                <h3 className="font-semibold text-white text-lg">{problem.title}</h3>
-                <p className="text-gray-300 text-base leading-relaxed whitespace-pre-line">{problem.description}</p>
-                {problem.constraints && <p className="text-sm text-gray-500">Constraints: {problem.constraints}</p>}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-400">Language:</span>
-                <select
-                  className="input-field w-40 py-2 text-sm"
-                  value={oaLanguage}
-                  disabled={oaLangLoading}
-                  onChange={e => changeOALanguage(e.target.value)}
-                >
-                  <option value="javascript">JavaScript</option>
-                  <option value="python">Python</option>
-                  <option value="java">Java</option>
-                  <option value="cpp">C++</option>
-                  <option value="c">C</option>
-                </select>
-                {oaLangLoading && <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
-              </div>
-              <div className="rounded-xl overflow-hidden border border-white/10">
-                <Editor
-                  height="550px"
-                  language={oaLanguage === 'cpp' ? 'cpp' : oaLanguage}
-                  theme="vs-dark"
-                  value={oaCode[oaCodingIndex] ?? problem.starterCode ?? ''}
-                  onChange={(val) => setOaCode(prev => ({ ...prev, [oaCodingIndex]: val ?? '' }))}
-                  options={{ minimap: { enabled: false }, fontSize: 14, lineNumbers: 'on', scrollBeyondLastLine: false, padding: { top: 12 } }}
-                />
-              </div>
-              <div className="flex gap-3">
-                <button onClick={runOACode} disabled={oaRunning} className="btn-primary flex items-center gap-2 disabled:opacity-50">
-                  {oaRunning ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Running...</> : <><Play className="w-4 h-4" /> Run Code</>}
-                </button>
-                <button onClick={() => oaCodingIndex < oaData.Coding.length - 1 ? setOaCodingIndex(i => i + 1) : advanceOASection()} className="btn-ghost text-sm">
-                  {oaCodingIndex < oaData.Coding.length - 1 ? 'Next Problem →' : 'Finish Assessment →'}
-                </button>
-              </div>
-              {runResult && (
-                <div className="space-y-2">
-                  <p className="text-sm text-gray-400">{runResult.passedCount}/{runResult.totalCount} test cases passed</p>
-                  {runResult.results.filter(r => !r.hidden).map((r, ri) => (
-                    <div key={ri} className={`card text-xs space-y-1 border ${r.passed ? 'border-green-500/20' : 'border-red-500/20'}`}>
-                      <p className="text-gray-400">Input: <span className="text-gray-300">{r.input}</span></p>
-                      <p className="text-gray-400">Expected: <span className="text-gray-300">{r.expectedOutput}</span></p>
-                      <p className="text-gray-400">Got: <span className={r.passed ? 'text-green-400' : 'text-red-400'}>{r.actualOutput || '(no output)'}</span></p>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+                <div className="space-y-4">
+                  <div className="card space-y-3 p-6">
+                    <h3 className="font-semibold text-white text-lg">{problem.title}</h3>
+                    <p className="text-gray-300 text-base leading-relaxed whitespace-pre-line">{problem.description}</p>
+                    {problem.constraints && <p className="text-sm text-gray-500">Constraints: {problem.constraints}</p>}
+                  </div>
+                  {runResult && (
+                    <div className="space-y-2">
+                      <p className="text-sm text-gray-400">{runResult.passedCount}/{runResult.totalCount} test cases passed</p>
+                      {runResult.results.filter(r => !r.hidden).map((r, ri) => (
+                        <div key={ri} className={`card text-xs space-y-1 border ${r.passed ? 'border-green-500/20' : 'border-red-500/20'}`}>
+                          <p className="text-gray-400">Input: <span className="text-gray-300">{r.input}</span></p>
+                          <p className="text-gray-400">Expected: <span className="text-gray-300">{r.expectedOutput}</span></p>
+                          <p className="text-gray-400">Got: <span className={r.passed ? 'text-green-400' : 'text-red-400'}>{r.actualOutput || '(no output)'}</span></p>
+                        </div>
+                      ))}
+                      <p className="text-xs text-gray-600">+ {runResult.results.filter(r => r.hidden).length} hidden test case(s)</p>
                     </div>
-                  ))}
-                  <p className="text-xs text-gray-600">+ {runResult.results.filter(r => r.hidden).length} hidden test case(s)</p>
+                  )}
                 </div>
-              )}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-sm text-gray-400">Language:</span>
+                    <select
+                      className="input-field w-40 py-2 text-sm"
+                      value={oaLanguage}
+                      disabled={oaLangLoading}
+                      onChange={e => changeOALanguage(e.target.value)}
+                    >
+                      <option value="javascript">JavaScript</option>
+                      <option value="python">Python</option>
+                      <option value="java">Java</option>
+                      <option value="cpp">C++</option>
+                      <option value="c">C</option>
+                    </select>
+                    {oaLangLoading && <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                    <button onClick={resetToStarterCode} className="btn-ghost text-xs ml-auto flex items-center gap-1">
+                      <RotateCcw className="w-3.5 h-3.5" /> Reset code
+                    </button>
+                  </div>
+                  <div className="rounded-xl overflow-hidden border border-white/10">
+                    <Editor
+                      height="500px"
+                      language={oaLanguage === 'cpp' ? 'cpp' : oaLanguage}
+                      theme="vs-dark"
+                      value={oaCode[oaCodingIndex] ?? problem.starterCode ?? ''}
+                      onChange={(val) => setOaCode(prev => ({ ...prev, [oaCodingIndex]: val ?? '' }))}
+                      options={{ minimap: { enabled: false }, fontSize: 14, lineNumbers: 'on', scrollBeyondLastLine: false, padding: { top: 12 } }}
+                    />
+                  </div>
+                  <div className="flex gap-3">
+                    <button onClick={runOACode} disabled={oaRunning} className="btn-primary flex items-center gap-2 disabled:opacity-50">
+                      {oaRunning ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Running...</> : <><Play className="w-4 h-4" /> Run Code</>}
+                    </button>
+                    <button onClick={() => oaCodingIndex < oaData.Coding.length - 1 ? setOaCodingIndex(i => i + 1) : advanceOASection()} className="btn-ghost text-sm">
+                      {oaCodingIndex < oaData.Coding.length - 1 ? 'Next Problem →' : 'Finish Assessment →'}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           );
         })()}
