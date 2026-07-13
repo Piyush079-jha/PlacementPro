@@ -301,6 +301,7 @@ export default function Interview() {
   };
 
   const resetOA = () => {
+    clearOAProgress();
     setStage(STAGES.MODE);
     setOaData({ Aptitude: [], Reasoning: [], Verbal: [], Coding: [] });
     setOaAnswers({ Aptitude: {}, Reasoning: {}, Verbal: {}, Coding: {} });
