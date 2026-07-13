@@ -641,6 +641,19 @@ export default function Interview() {
         <h1 className="text-3xl font-display font-bold text-white mb-1">Online Assessment</h1>
         <p className="text-gray-500">Aptitude, Reasoning, Verbal, and Coding — each section is timed, just like a real OA</p>
       </div>
+      {oaLoading ? (
+        <div className="card max-w-lg space-y-5 animate-pulse">
+          <div className="h-5 w-40 bg-white/10 rounded" />
+          <div className="space-y-3">
+            {OA_SECTIONS.map(s => (
+              <div key={s} className="h-11 rounded-xl bg-white/5 border border-white/10" />
+            ))}
+          </div>
+          <div className="h-9 w-full bg-white/5 rounded-xl" />
+          <div className="h-11 w-full bg-primary-500/20 rounded-xl" />
+          <p className="text-xs text-gray-600 text-center">Preparing your assessment — this can take a few seconds...</p>
+        </div>
+      ) : (
       <div className="card max-w-lg space-y-5">
         <h2 className="font-display font-semibold text-white flex items-center gap-2">
           <Play className="w-4 h-4 text-primary-400" /> What to expect
@@ -659,6 +672,7 @@ export default function Interview() {
         </button>
         <button onClick={() => setStage(STAGES.MODE)} className="btn-ghost w-full text-sm">← Back to mode selection</button>
       </div>
+      )}
     </div>
   );
 
