@@ -705,24 +705,30 @@ export default function Interview() {
                 <p className="text-gray-300 text-base leading-relaxed whitespace-pre-line">{problem.description}</p>
                 {problem.constraints && <p className="text-sm text-gray-500">Constraints: {problem.constraints}</p>}
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs text-gray-500 mr-1">Language:</span>
-                {['javascript', 'python', 'java', 'cpp', 'c'].map(lang => (
-                  <button key={lang} onClick={() => changeOALanguage(lang)} disabled={oaLangLoading}
-                    className={`py-1.5 px-3 rounded-lg text-xs font-medium border transition-all disabled:opacity-50 ${oaLanguage === lang ? 'bg-primary-500 border-primary-500 text-white' : 'border-white/10 text-gray-400 hover:border-primary-500/30'}`}>
-                    {lang === 'javascript' ? 'JS' : lang === 'cpp' ? 'C++' : lang.charAt(0).toUpperCase() + lang.slice(1)}
-                  </button>
-                ))}
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-400">Language:</span>
+                <select
+                  className="input-field w-40 py-2 text-sm"
+                  value={oaLanguage}
+                  disabled={oaLangLoading}
+                  onChange={e => changeOALanguage(e.target.value)}
+                >
+                  <option value="javascript">JavaScript</option>
+                  <option value="python">Python</option>
+                  <option value="java">Java</option>
+                  <option value="cpp">C++</option>
+                  <option value="c">C</option>
+                </select>
                 {oaLangLoading && <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
               </div>
               <div className="rounded-xl overflow-hidden border border-white/10">
                 <Editor
-                  height="300px"
+                  height="550px"
                   language={oaLanguage === 'cpp' ? 'cpp' : oaLanguage}
                   theme="vs-dark"
                   value={oaCode[oaCodingIndex] ?? problem.starterCode ?? ''}
                   onChange={(val) => setOaCode(prev => ({ ...prev, [oaCodingIndex]: val ?? '' }))}
-                  options={{ minimap: { enabled: false }, fontSize: 13 }}
+                  options={{ minimap: { enabled: false }, fontSize: 14, lineNumbers: 'on', scrollBeyondLastLine: false, padding: { top: 12 } }}
                 />
               </div>
               <div className="flex gap-3">
