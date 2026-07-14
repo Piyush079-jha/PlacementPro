@@ -378,7 +378,7 @@ CRITICAL OUTPUT RULES:
 Each problem must be solvable by reading input from stdin and printing output to stdout (like a real OA judge).
 Provide 3 test cases per problem: 2 visible (hidden: false) and 1 hidden (hidden: true).
 
-IMPORTANT formatting rule for "starterCode": write it as properly indented, multi-line, human-readable ${language} code, exactly as it would appear in a code editor (never a single-line/minified version). Include helpful comments like "// write your code here" where the candidate should fill in logic.
+IMPORTANT formatting rule for "starterCode": write it as properly indented, multi-line, human-readable ${language} code, exactly as it would appear in a code editor (never a single-line/minified version). Use ${language}'s correct native comment syntax throughout (e.g. "#" for Python, "//" for JavaScript/C/C++/Java) — never mix comment styles from other languages. Include a comment in the correct syntax for ${language} marking where the candidate should fill in logic (e.g. "write your code here").
 
 Return JSON array:
 [
@@ -435,7 +435,7 @@ router.post('/starter-code', auth, async (req, res) => {
     const userMessage = `Problem: "${title}"
 ${description}
 
-Write starter code in ${language} that reads input from stdin and prints output to stdout, matching this problem. Include a comment like "// write your code here" for the candidate to fill in.
+Write starter code in ${language} that reads input from stdin and prints output to stdout, matching this problem. Use ${language}'s correct native comment syntax (e.g. "#" for Python, "//" for JavaScript/C/C++/Java) for a comment marking where the candidate should fill in logic (e.g. "write your code here").
 Return JSON:
 { "starterCode": "properly indented, multi-line ${language} starter code" }`;
 
