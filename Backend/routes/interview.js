@@ -360,7 +360,12 @@ router.post('/coding-questions', auth, async (req, res) => {
 
     const systemPrompt = `You are an expert DSA problem setter for Indian campus placement Online Assessments (like TCS NQT, Infosys, Capgemini).
 Generate realistic coding problems with clear input/output format, similar to real OA coding rounds.
-Respond with valid JSON only.`;
+
+CRITICAL OUTPUT RULES:
+- Respond with ONE valid JSON array and NOTHING else — no markdown, no code fences, no \`\`\`json blocks, no explanatory text before or after.
+- Every field must be a single JSON string value. NEVER put literal line breaks inside a string — use \\n escape sequences instead.
+- NEVER nest markdown code fences (\`\`\`) inside any field, including "description" and "starterCode". "starterCode" must be a plain string with \\n escapes, not a fenced code block.
+- The entire response must be parseable directly by JSON.parse with no post-processing.`;
 
     const topics = ['arrays', 'strings', 'basic loops and conditionals', 'sorting', 'searching', 'recursion basics', 'hashmaps', 'two pointers'];
     const randomTopic = topics[Math.floor(Math.random() * topics.length)];
