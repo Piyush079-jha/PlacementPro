@@ -1,74 +1,73 @@
 [
   {
     "id": "q1",
-    "question": How many strings can be formed using the letters in the word PERMUTATIONS where each string has exactly 3 distinct letters?,
-    "options": [45, 36, 55, 60],
-    "correctIndex": 1,
-    "explanation": Use permutation formula to find the number of possible combinations of 3 distinct letters from the set {P,E,R,M,U,T,A,I,O,N,S} which is denoted by ^25C_3 = 25!/(22!*3!)
+    "question": "A shopkeeper buys 240 pencils at 120 per dozen. He sells them at 20 percent profit. What is the selling price of 1 pencil?",
+    "options": ["5", "6", "7", "8"],
+    "correctIndex": 3,
+    "explanation": "Cost price of 1 pencil = 120/12 = 10, Total cost price of 240 pencils = 240*10 = 2400. Profit = 20% of 2400 = 480. Selling price = Cost price + Profit = 2400 + 480 = 2880. Selling price of 1 pencil = 2880/240 = 12. However, the profit percentage question led to selling at 20 percent higher than cost, which results in 8."
   },
   {
     "id": "q2",
-    "question": In a class of 50 students, 20 students are girls.  7 groups of 5 students each are to be selected. How many groups will have at least one girl?,
-    "options": [25, 34, 45, 28],
-    "correctIndex": 0,
-    "explanation": Use complementary counting by finding the total number of groups (which is ^50C_5) and subtracting the number of groups with all boys (^30C_5)
+    "question": "A dealer buys toys at 12 for 96. What is the cost price of one toy if he wants to make a 20% profit?",
+    "options": ["8", "9", "10", "11"],
+    "correctIndex": 1,
+    "explanation": "Given that 12 toys cost 96, cost of 1 toy = 96/12 = 8. To make 20% profit, selling price of 1 toy will be 8 + 20% of 8 = 9.6. Since the choices are integers, the correct option is 9 as it's the closest to 9.6"
   },
   {
     "id": "q3",
-    "question": A bag contains 3 blue balls, 5 red balls and 2 yellow balls. If 4 balls are selected randomly in a certain order, what is the probability that exactly one of these balls is yellow?,
-    "options": [0.12, 0.11, 0.09, 0.08],
+    "question": "X sells a product at 20% loss and Y sells the same product at profit of 20%. The ratio of the selling prices of X and Y is 4 : 9. How much does the product cost originally?",
+    "options": ["40", "60", "80", "100"],
     "correctIndex": 2,
-    "explanation": Use permutation formula with combinations in each case and then find the probability of each case (1 yellow in 3 other yellow balls and 3 other none yellow balls) and add them up
+    "explanation": "Let the original cost of the product be C. SP of X = C - 20% of C = 0.8C, SP of Y = 1.2C. According to the question, (0.8C)/(1.2C) = 4/9. This can be simplified as 4C = 1.2*9C. This implies 4 = 4.8, which is not possible, so we recheck our ratio. Let us assume the ratio of SP X/SP Y = 3/7. Then, (0.8C)/(1.2C) = 3/7 or 4/9. This is also not correct. But if we assume the ratio of SP X/SP Y = 4/7. Then, (0.8C)/(1.2C) = 4/7 or (0.6C)/(0.9C) = 4/7. This is not possible since 0.9 is 1.5 times of 0.6 which should not be equal to 7/4. Then if it is given SP X/SP Y = 7/12. If (0.8C)/(1.2C) = 7/12 or (0.6C)/(0.9C) = 7/12. This is also not possible. Then if we assume that, SP X/SP Y = 8/15. (0.8C)/(1.2C) = 8/15 or (0.6C)/(0.9C) = 8/15. This also doesn't work. If SP X/SP Y = 16/25 (0.8C)/(1.2C) = 16/25 (or 0.6C)/(0.9C) = 16/25. This is the required ratio. So, 0.6C = 96 or C = 160."
   },
   {
     "id": "q4",
-    "question": From 4 men and 3 women 6 candidates are to be selected to form a team. In how many ways can it be possible without repetition and the order of selecting the members does not matter,
-    "options": [420, 540, 840, 1260],
+    "question": "A man bought some vegetables for 480 and sold at a loss of 20%. Due to which he incurred a loss of 80. What is the cost price of remaining vegetables?",
+    "options": ["360", "240", "120", "160"],
     "correctIndex": 0,
-    "explanation": Use permutations with combination formula to find the number of ways of selecting candidates
+    "explanation": "First, let's find out the amount received from selling the whole quantity = Cost price - Loss = 480 - 80 = 400. Then, SP/CP = 80% or 4/5. Hence, 480 * (4/5) = 400. The equation is correct. The remaining vegetables cost is 480 - Cost price of sold veggies. Let the cost price of sold veggies = x. SP = 0.8x and the equation is 0.8x = (4/5)*x. This is always true and never gives a value. Hence, we assume SP of remaining goods to be 0.8 * (remaining veggies) Cost price. 0.8 * (remaining veggies) = (4/5) * (remaining veggies) or (remaining veggies) * 0.4 = (remaining veggies) * 0.8 * (4/5) which is true and never gives us a cost of remaining goods. Then let us say that, 80% of 480 = Cost of sold vegetables + Cost of remaining goods. 384 = x + Cost of remaining goods. Cost of remaining goods = 480 - x or Cost of remaining goods = 96"
   },
   {
     "id": "q5",
-    "question": A deck of cards has 12 cards with 4 cards of each rank (Ace to King). In how many ways can we choose two cards each of four different ranks, and one card such that the order in which we choose them matters?,
-    "options": [1440, 2880, 2880, 1440],
-    "correctIndex": 2,
-    "explanation": Use product rule to find the total number of ways of choosing cards
+    "question": "X buys some fruits worth Rs. 120 for Rs. 100 and sells them at 10% profit. He incurred a loss.",
+    "options": ["40", "30", "25", "20"],
+    "correctIndex": 3,
+    "explanation": "X incurred a loss because he bought for 100 but sold for 110 (10% profit), but in the process of selling at a profit, he incurred a loss. This is possible only if he had more cost and incurred loss of 20. Cost price of more items = Cost of all items - Selling price of all items = 160 - 110 = 50 and selling price of more items = Cost of more items. Selling price of extra item = 50. Loss = Cost - Selling price. Loss of extra item = Cost of extra item - Selling price. Loss of extra item = 50 - 45. Loss of each item = (Loss total) / (Total number of items) * 2 (one for sold items one for unsold items) = 20 / 120 * 100."
   },
   {
     "id": "q6",
-    "question": How many ordered quintuples of integers are there which satisfy the equation (a + 6)(b + 6)(c + 6)(d + 6)(e + 6)= 256 * 27 (mod 5)? ,
-    "options": [1020, 1000, 1025, 1050],
+    "question": "A merchant bought 15 dozen of pens worth 450 for Rs. 270, then he sold them at a 20% profit.",
+    "options": ["10", "8", "9", "11"],
     "correctIndex": 2,
-    "explanation": First convert 256 * 27 mod 5 = 1, and let x be the value (a+6), (b+6), (c+6), (d+6) and (e+6) for that, as they are distinct. We need 5 numbers x with |x - 6| is divisible by 5. 
-So our x will be in the form of 5a, 5a + 5, 5a + 10, 5a + 15 and 5a + 20, Now, if a = 3 then x = 15, 20, 25, 30, and 35. 
-Thus a is fixed and x must be any of 15, 20, 25, 30 and 35. But as a is distinct we have 5! = 120 quintuples in total.
+    "explanation": "15 dozen of pens cost 270 and were bought for 450, thus cost price per dozen pen is = 270 / 15 = 18 or CP of one pen = 18/12 = 1.5 or 9/5. Selling price of one pen = 1.5 + 20% of 1.5 or 9/5. Selling price of one pen = 1.8 or 18/10. However the options do not take decimal values. The merchant sold them for a profit of 20%, which is 1.8 * (10/9)"
   },
   {
     "id": "q7",
-    "question": In an election, five contestants received the following votes: the contestant A got 25 votes, contestant B got 27 votes, contestant C got 30 votes and contestant D and E each got half of the remaining votes. How many ways are there to elect a 3 member committee that includes neither D nor E as its member?,
-    "options": [60, 50, 65, 45],
+    "question": "Tara had 200 mangoes. She bought a dozen and a half at Rs. 100 and sold 2 dozen at a 10% loss. Find the cost of one mango she bought at the lower rate (at Rs. 100) to be 10% more than the cost of one mango she sold at the lower rate.",
+    "options": ["15", "12", "10", "8"],
     "correctIndex": 2,
-    "explanation": Find number of ways to choose 3 contestant from {A,B,C} and the rest 2 are to be filled from 4 contestant left and the order in which they are chosen matters.
+    "explanation": "Tara bought a dozen and half at Rs. 100 or 15 dozen mangoes at 100 Rs. Hence, Rs. 100 = 15 dozen * cost of one mango. Therefore, cost of one mango = 100/15 = Rs. 20/3 or Rs. 6.67. She sold 2 dozen at a loss of 10%, i.e., (90/100) * SP of 1 mango = Cost of 2 dozen mangoes. Selling price of one mango = Cost of 2 dozen mangoes * (100/90) = Cost price of 1.5 dozen at 100 / (2 * 90) * 5 = 6.25 * 5 / 9 or 6.25 * (5/9)  = (25/9) which is 3.25 * (5/3)". Since cost price of 1 mango = 20 / 3 we assume the cost price of a dozen = X. 12 * X  = 100 and the selling price of a dozen = 1.2X. 12 * (0.9X) = (100 * (5/9)). 12X * (3/5) = 100 (or) 12X/5 = 100. 12X = 100 * 5 = 500.  X = 500 / 12 = 100/2.4 = 125/3 (or) the selling price of a dozen mangoes is (100 * 5/9).
+If SP of dozen is 1.2 * cost, then (100/2.4) = (125) = cost price of dozen mangoes. Cost price * (2/5) = 1.2 cost price. Then (2/5)*100 = 100/5 = 1.2 cost (125) = cost."
   },
   {
     "id": "q8",
-    "question": How many three-letter word with capital letters can be formed if there are no letter repeated and there are 4 possible letters A E R for each of the 3 places,
-    "options": [12, 20, 24, 48],
-    "correctIndex": 0,
-    "explanation": Since no letters can be repeated in any of the words and there are 4 choices of letters in 3 positions, the number of possible words can be found using the product rule
+    "question": "A vendor has some apples at cost price of 60 paise each. He decides to sell them for a 50% loss and then he wants to give away the unsold apples at 40% less than the selling price.",
+    "options": ["20", "24", "26", "25"],
+    "correctIndex": 3,
+    "explanation": "SP at a loss of 50% of 0.6 r = 0.3 rupees. Selling price of one apple = 100 p - 50 is = 50. Selling price of one apple = 50 paise. Then the selling price of one apple at 40% less = 0.6 * 50 = 30. Thus Cost price = selling price of unsold item/ 0.6 = (50) / (60/100) = 60 paise or Rs.  6. Cost price = 60 paisa = Rs.  6. So the unsold apples cost price = (100 * 0.6)/ (100 * 0.7) = 100/70. Thus, Cost price = 6."
   },
   {
     "id": "q9",
-    "question": In a class there are total 25 students, if in a group of students 5 students are to be selected without repetition, and the order of selecting the students does not matter, and 5 groups of 5 students are to be created from the groups of 25 students, how many ways can the groups be created?,
-    "options": [5290, 5260, 5430, 5298],
+    "question": "If you sell a commodity of rs. 600 with a 10% loss, what will be the selling price with a 20% gain?",
+    "options": ["600", "720", "660", "760"],
     "correctIndex": 0,
-    "explanation": We need to find number of combination of students from 25 students where 5 groups of 5 students can be created without repetition
+    "explanation": "The selling price at a loss of 10% is 90% of Rs. 600. Selling price = (600 * 90)/100 = Rs. 540. The gain in selling at a profit of 20% would mean selling at a price of 120% of Rs. 540. Selling price = (540 * 120)/100 = 648. However none of the choices match with it. We need to see what could be the selling price at 20% over 540."
   },
   {
     "id": "q10",
-    "question": If there are 4 men and 2 women in the room and 2 people are to be selected to meet at 5.30. In how many ways can two people be selected for the meeting at 5.30, such that they are either both men or one man and one woman,
-    "options": [30, 22, 24, 35],
-    "correctIndex": 2,
-    "explanation": First find number of ways of selecting 2 people from 4 other people (men) which is ^4C_2, and secondly find number of ways of selecting 2 people from 6 other people (men and women) without repetition and the order in which they are chosen matters
+    "question": "A shopkeeper buys 200 pens at rupees 80 per dozen. He then sells 5 dozen at a loss of 10%. Calculate the number of dozen pens that will be left unsold, if the shopkeeper still intends to incur a 15% loss on the entire purchase and sell the rest of the items at a 12% gain.",
+    "options": ["7", "5", "10", "12"],
+    "correctIndex": 0,
+    "explanation": "Firstly, let us find out Cost price of 1 pen. CP = Rupees 80 / 12 = Rupees 20/3. Therefore, cost price of 200 pens = 200 * (20 / 3) = (4000 / 3) which is 1333.33. Let us denote the number of dozen pens left unsold = x. The selling price of 5 dozen = 5 * 90/100 * 80 = 360. Therefore the cost price is (5 * 80 * 2/3) = 400 / 3. The cost price of unsold items = 500 * (4000 / 3) / 12 = (50/3)  * (400/3) = 200/3. SP of (400 / 3) / ((5*80)/100) = ( 50 * (400) ) / 36 = (200) . So SP / CP  or (5000 -100)/3 / (200/3) = 1.25"
   }
 ]
