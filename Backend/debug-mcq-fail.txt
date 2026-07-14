@@ -1,73 +1,72 @@
 [
   {
     "id": "q1",
-    "question": "A shopkeeper buys 240 pencils at 120 per dozen. He sells them at 20 percent profit. What is the selling price of 1 pencil?",
-    "options": ["5", "6", "7", "8"],
-    "correctIndex": 3,
-    "explanation": "Cost price of 1 pencil = 120/12 = 10, Total cost price of 240 pencils = 240*10 = 2400. Profit = 20% of 2400 = 480. Selling price = Cost price + Profit = 2400 + 480 = 2880. Selling price of 1 pencil = 2880/240 = 12. However, the profit percentage question led to selling at 20 percent higher than cost, which results in 8."
+    "question": A train travels from City A to City B at a speed of 60 km/hour, and a bus travels in the opposite direction from City B to City A at a speed of 40 km/hour. If the distance between the two cities is 210 km, then the time taken by the train and the bus to cross each other is in the ratio of:
+    "options": ["1:2", "2:1", "3:2", "4:1"],
+    "correctIndex": 0,
+    "explanation": The train's relative speed to the bus is 60 + 40 = 100 km/hour. Using d = rt we find that the time taken to cross is 2.1 km / 100 km/hour = 0.021 hr. For the train the time taken is 210 / 60 = 3.5 hr, and for the bus it is 210 / 40 = 5.25 hr, giving us a ratio of 1:2."
   },
   {
     "id": "q2",
-    "question": "A dealer buys toys at 12 for 96. What is the cost price of one toy if he wants to make a 20% profit?",
-    "options": ["8", "9", "10", "11"],
-    "correctIndex": 1,
-    "explanation": "Given that 12 toys cost 96, cost of 1 toy = 96/12 = 8. To make 20% profit, selling price of 1 toy will be 8 + 20% of 8 = 9.6. Since the choices are integers, the correct option is 9 as it's the closest to 9.6"
+    "question": A bicycle and a car are moving in the same direction with speeds of 20 m/s and 30 m/s respectively. What is their relative speed if the bicycle is going 50 meters ahead of the car?
+    "options": ["5 m/s", "10 m/s", "20 m/s", "25 m/s"],
+    "correctIndex": 2,
+    "explanation": Relative speed is the difference in speeds, so 30 m/s - 20 m/s = 10 m/s."
   },
   {
     "id": "q3",
-    "question": "X sells a product at 20% loss and Y sells the same product at profit of 20%. The ratio of the selling prices of X and Y is 4 : 9. How much does the product cost originally?",
-    "options": ["40", "60", "80", "100"],
+    "question": A man travels from city X to city Y at an average speed of 70 km/hour and returns to city X at an average speed of 60 km/hour. What is the ratio of the time taken for the onward journey to the return journey?
+    "options": ["5:7", "7:9", "4:5", "3:4"],
     "correctIndex": 2,
-    "explanation": "Let the original cost of the product be C. SP of X = C - 20% of C = 0.8C, SP of Y = 1.2C. According to the question, (0.8C)/(1.2C) = 4/9. This can be simplified as 4C = 1.2*9C. This implies 4 = 4.8, which is not possible, so we recheck our ratio. Let us assume the ratio of SP X/SP Y = 3/7. Then, (0.8C)/(1.2C) = 3/7 or 4/9. This is also not correct. But if we assume the ratio of SP X/SP Y = 4/7. Then, (0.8C)/(1.2C) = 4/7 or (0.6C)/(0.9C) = 4/7. This is not possible since 0.9 is 1.5 times of 0.6 which should not be equal to 7/4. Then if it is given SP X/SP Y = 7/12. If (0.8C)/(1.2C) = 7/12 or (0.6C)/(0.9C) = 7/12. This is also not possible. Then if we assume that, SP X/SP Y = 8/15. (0.8C)/(1.2C) = 8/15 or (0.6C)/(0.9C) = 8/15. This also doesn't work. If SP X/SP Y = 16/25 (0.8C)/(1.2C) = 16/25 (or 0.6C)/(0.9C) = 16/25. This is the required ratio. So, 0.6C = 96 or C = 160."
+    "explanation": Since distance is the same for both journeys, the ratio is the inverse of the speed ratio, so 60:70, which simplifies to 6:7 and then 4:5 after dividing through by 2."
   },
   {
     "id": "q4",
-    "question": "A man bought some vegetables for 480 and sold at a loss of 20%. Due to which he incurred a loss of 80. What is the cost price of remaining vegetables?",
-    "options": ["360", "240", "120", "160"],
-    "correctIndex": 0,
-    "explanation": "First, let's find out the amount received from selling the whole quantity = Cost price - Loss = 480 - 80 = 400. Then, SP/CP = 80% or 4/5. Hence, 480 * (4/5) = 400. The equation is correct. The remaining vegetables cost is 480 - Cost price of sold veggies. Let the cost price of sold veggies = x. SP = 0.8x and the equation is 0.8x = (4/5)*x. This is always true and never gives a value. Hence, we assume SP of remaining goods to be 0.8 * (remaining veggies) Cost price. 0.8 * (remaining veggies) = (4/5) * (remaining veggies) or (remaining veggies) * 0.4 = (remaining veggies) * 0.8 * (4/5) which is true and never gives us a cost of remaining goods. Then let us say that, 80% of 480 = Cost of sold vegetables + Cost of remaining goods. 384 = x + Cost of remaining goods. Cost of remaining goods = 480 - x or Cost of remaining goods = 96"
+    "question": A boy travels from point A to point B at 3 m/s and returns at 2 m/s. What is the ratio of time taken for onward journey to the return journey?
+    "options": ["6:5", "4:5", "3:2", "5:3"],
+    "correctIndex": 2,
+    "explanation": The ratio is the inverse of the speed ratio, so 2:3, and then simplifies to 2:3."
   },
   {
     "id": "q5",
-    "question": "X buys some fruits worth Rs. 120 for Rs. 100 and sells them at 10% profit. He incurred a loss.",
-    "options": ["40", "30", "25", "20"],
-    "correctIndex": 3,
-    "explanation": "X incurred a loss because he bought for 100 but sold for 110 (10% profit), but in the process of selling at a profit, he incurred a loss. This is possible only if he had more cost and incurred loss of 20. Cost price of more items = Cost of all items - Selling price of all items = 160 - 110 = 50 and selling price of more items = Cost of more items. Selling price of extra item = 50. Loss = Cost - Selling price. Loss of extra item = Cost of extra item - Selling price. Loss of extra item = 50 - 45. Loss of each item = (Loss total) / (Total number of items) * 2 (one for sold items one for unsold items) = 20 / 120 * 100."
+    "question": Two trains are moving in the opposite direction with speeds of 60 km/hour and 80 km/hour respectively. What is their relative speed?
+    "options": ["40 km/hour", "50 km/hour", "100 km/hour", "160 km/hour"],
+    "correctIndex": 2,
+    "explanation": Their relative speed is the sum of their speeds, which is 60 km/hour + 80 km/hour = 140 km/hour. Then take this speed and divide it by 4. You will get relative speed as 35 * 4 = 140/4 = 35. So 140 - 35 = 105 and then 2 * 35 is 70, so you will get 105 - 70 = 35, finally you will get 70 + 35 = 105. Finally we get 140 - 35 = 105."
   },
   {
     "id": "q6",
-    "question": "A merchant bought 15 dozen of pens worth 450 for Rs. 270, then he sold them at a 20% profit.",
-    "options": ["10", "8", "9", "11"],
+    "question": A bus is going 25 km/hour slower than another bus. If the faster bus takes 5 hours to travel a distance of 300 km, then the time taken by the slower bus to travel the same distance is:
+    "options": ["5 minutes", "5.5 hours", "6 hours", "7 hours"],
     "correctIndex": 2,
-    "explanation": "15 dozen of pens cost 270 and were bought for 450, thus cost price per dozen pen is = 270 / 15 = 18 or CP of one pen = 18/12 = 1.5 or 9/5. Selling price of one pen = 1.5 + 20% of 1.5 or 9/5. Selling price of one pen = 1.8 or 18/10. However the options do not take decimal values. The merchant sold them for a profit of 20%, which is 1.8 * (10/9)"
+    "explanation": The time it took for the faster bus was 300/75 = 4 hours. Thus, the slower bus's time will be 4 hours more."
   },
   {
     "id": "q7",
-    "question": "Tara had 200 mangoes. She bought a dozen and a half at Rs. 100 and sold 2 dozen at a 10% loss. Find the cost of one mango she bought at the lower rate (at Rs. 100) to be 10% more than the cost of one mango she sold at the lower rate.",
-    "options": ["15", "12", "10", "8"],
-    "correctIndex": 2,
-    "explanation": "Tara bought a dozen and half at Rs. 100 or 15 dozen mangoes at 100 Rs. Hence, Rs. 100 = 15 dozen * cost of one mango. Therefore, cost of one mango = 100/15 = Rs. 20/3 or Rs. 6.67. She sold 2 dozen at a loss of 10%, i.e., (90/100) * SP of 1 mango = Cost of 2 dozen mangoes. Selling price of one mango = Cost of 2 dozen mangoes * (100/90) = Cost price of 1.5 dozen at 100 / (2 * 90) * 5 = 6.25 * 5 / 9 or 6.25 * (5/9)  = (25/9) which is 3.25 * (5/3)". Since cost price of 1 mango = 20 / 3 we assume the cost price of a dozen = X. 12 * X  = 100 and the selling price of a dozen = 1.2X. 12 * (0.9X) = (100 * (5/9)). 12X * (3/5) = 100 (or) 12X/5 = 100. 12X = 100 * 5 = 500.  X = 500 / 12 = 100/2.4 = 125/3 (or) the selling price of a dozen mangoes is (100 * 5/9).
-If SP of dozen is 1.2 * cost, then (100/2.4) = (125) = cost price of dozen mangoes. Cost price * (2/5) = 1.2 cost price. Then (2/5)*100 = 100/5 = 1.2 cost (125) = cost."
+    "question": A person travels at 12 m/s in still water. However, when rowing against an ocean current of 1.5 m/s, the speed becomes 7.4 m/s. What is the speed of the current?
+    "options": ["1 m/s", "1.2 m/s", "1.5 m/s", "2 m/s"],
+    "correctIndex": 3,
+    "explanation": Speed = 12 - 1.5 = 10.5 and 10.5 = 12 - 1.5 or 10.5 + 1.5 = 12. Thus, the ocean current's speed is 1.5."
   },
   {
     "id": "q8",
-    "question": "A vendor has some apples at cost price of 60 paise each. He decides to sell them for a 50% loss and then he wants to give away the unsold apples at 40% less than the selling price.",
-    "options": ["20", "24", "26", "25"],
-    "correctIndex": 3,
-    "explanation": "SP at a loss of 50% of 0.6 r = 0.3 rupees. Selling price of one apple = 100 p - 50 is = 50. Selling price of one apple = 50 paise. Then the selling price of one apple at 40% less = 0.6 * 50 = 30. Thus Cost price = selling price of unsold item/ 0.6 = (50) / (60/100) = 60 paise or Rs.  6. Cost price = 60 paisa = Rs.  6. So the unsold apples cost price = (100 * 0.6)/ (100 * 0.7) = 100/70. Thus, Cost price = 6."
+    "question": The distance between two cities is 600 miles. A train travels from city A to city B at 60 miles per hour and a man cycles in the same direction at 20 miles per hour. How long will it take for the train to be ahead of the man by 100 miles?
+    "options": ["5 hr", "5.5 hr", "6 hr", "6.5 hr"],
+    "correctIndex": 1,
+    "explanation": Relative speed of the train to man is 80 m/hr. Thus the time taken is 700 miles/ 80 m/hours = 5.75. Thus, it will take 100/80 * 60 = 7.5 * 5/5.75 = 5.25 hours for the train to be ahead of the man by 100 miles."
   },
   {
     "id": "q9",
-    "question": "If you sell a commodity of rs. 600 with a 10% loss, what will be the selling price with a 20% gain?",
-    "options": ["600", "720", "660", "760"],
+    "question": A train is moving at 20 m/s and a man running at 5 m/s. Their speeds are added together in one direction. The relative speed is their sum. What is the time at which the train will be 100 meters ahead of the man?
+    "options": ["1 second", "2 seconds", "4 seconds", "10 seconds"],
     "correctIndex": 0,
-    "explanation": "The selling price at a loss of 10% is 90% of Rs. 600. Selling price = (600 * 90)/100 = Rs. 540. The gain in selling at a profit of 20% would mean selling at a price of 120% of Rs. 540. Selling price = (540 * 120)/100 = 648. However none of the choices match with it. We need to see what could be the selling price at 20% over 540."
+    "explanation": Their relative speed is 25 m/s. The time taken will be 100 / 25 = 4 seconds."
   },
   {
     "id": "q10",
-    "question": "A shopkeeper buys 200 pens at rupees 80 per dozen. He then sells 5 dozen at a loss of 10%. Calculate the number of dozen pens that will be left unsold, if the shopkeeper still intends to incur a 15% loss on the entire purchase and sell the rest of the items at a 12% gain.",
-    "options": ["7", "5", "10", "12"],
-    "correctIndex": 0,
-    "explanation": "Firstly, let us find out Cost price of 1 pen. CP = Rupees 80 / 12 = Rupees 20/3. Therefore, cost price of 200 pens = 200 * (20 / 3) = (4000 / 3) which is 1333.33. Let us denote the number of dozen pens left unsold = x. The selling price of 5 dozen = 5 * 90/100 * 80 = 360. Therefore the cost price is (5 * 80 * 2/3) = 400 / 3. The cost price of unsold items = 500 * (4000 / 3) / 12 = (50/3)  * (400/3) = 200/3. SP of (400 / 3) / ((5*80)/100) = ( 50 * (400) ) / 36 = (200) . So SP / CP  or (5000 -100)/3 / (200/3) = 1.25"
+    "question": A car and a truck are travelling in the opposite direction at speeds of 30 m/s and 40 m/s respectively. What are their relative speeds?
+    "options": ["10 m/s", "20 m/s", "60 m/s", "100 m/s"],
+    "correctIndex": 3,
+    "explanation": Their relative speeds are the sum of their speeds, which is 30 m/s + 40 m/s = 70 m/s"
   }
 ]

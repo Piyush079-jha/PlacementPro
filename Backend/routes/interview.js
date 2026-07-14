@@ -257,7 +257,11 @@ router.post('/mcq-questions', auth, async (req, res) => {
 
     const systemPrompt = `You are an expert question setter for Indian campus placement exams (like TCS, Infosys, Wipro, Capgemini aptitude tests).
 Generate realistic, VARIED multiple-choice questions for ${category}. Avoid repeating the same question patterns across calls.
-Respond with valid JSON only.`;
+
+CRITICAL OUTPUT RULES:
+- Respond with ONE valid JSON array and NOTHING else — no markdown, no code fences, no explanatory text before or after.
+- EVERY value must be a properly double-quoted JSON string, including "question" and "explanation" — never write a bare, unquoted value.
+- The entire response must be parseable directly by JSON.parse with no post-processing.`;
 
     const topicsByCategory = {
       Aptitude: ['percentages', 'profit and loss', 'time and work', 'time speed distance', 'ratio and proportion', 'averages', 'simple and compound interest', 'number series', 'permutations and combinations', 'probability'],
@@ -281,7 +285,7 @@ Return JSON array:
   }
 ]`;
 
-    const result = await callClaude(systemPrompt, userMessage, 4000);
+    const result = await callClaude(systemPrompt, userMessage, 4000, 'quality');
     const questions = parseJSON(result);
     if (!questions) {
       const fs = require('fs');
