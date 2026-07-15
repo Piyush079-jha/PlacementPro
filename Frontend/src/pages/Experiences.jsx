@@ -93,7 +93,9 @@ const ExperienceCard = ({ exp, onUpvote, onEdit, onDelete, currentUserId }) => {
 };
 
 export default function Experiences() {
+  const { user } = useAuth();
   const [experiences, setExperiences] = useState([]);
+  const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [seeding, setSeeding] = useState(false);
