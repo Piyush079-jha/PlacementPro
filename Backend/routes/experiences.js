@@ -80,4 +80,46 @@ router.post('/seed', async (req, res) => {
   }
 });
 
+// Update an experience (owner only)
+router.put('/:id', auth, async (req, res) => {
+  try {
+    const experience = await Experience.findById(req.params.id);
+    if (!experience) return res.status(404).json({ error: 'Experience not found' });
+    if (experience.user?.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Not authorized to edit this experience' });
+    }
+
+    const { company, role, type, year, package: pkg, rounds, tips, verdict, isAnonymous } = req.body;
+    if (company !== undefined) experience.company = company;
+    if (role !== undefined) experience.role = role;
+    if (type !== undefined) experience.type = type;
+    if (year !== undefined) experience.year = year;
+    if (pkg !== undefined) experience.package = pkg;
+    if (rounds !== undefined) experience.rounds = rounds;
+    if (tips !== undefined) experience.tips = tips;
+    if (verdict !== undefined) experience.verdict = verdict;
+    if (isAnonymous !== undefined) experience.isAnonymous = isAnonymous;
+
+    await experience.save();
+    res.json({ success: true, experience });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Delete an experience (owner only)
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const experience = await Experience.findById(req.params.id);
+    if (!experience) return res.status(404).json({ error: 'Experience not found' });
+    if (experience.user?.toString() !== req.userId) {
+      return res.status(403).json({ error: 'Not authorized to delete this experience' });
+    }
+    await experience.deleteOne();
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 module.exports = router;
