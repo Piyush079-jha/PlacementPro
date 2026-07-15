@@ -136,6 +136,28 @@ export default function Experiences() {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm('Delete this experience? This cannot be undone.')) return;
+    try {
+      await axios.delete(`/api/experiences/${id}`);
+      setExperiences(prev => prev.filter(e => e._id !== id));
+      toast.success('Experience deleted');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to delete');
+    }
+  };
+
+  const handleEdit = (exp) => {
+    setEditingId(exp._id);
+    setForm({
+      company: exp.company, role: exp.role, type: exp.type, year: exp.year,
+      package: exp.package || '', tips: exp.tips || '', verdict: exp.verdict,
+      isAnonymous: exp.isAnonymous || false,
+      rounds: exp.rounds?.length ? exp.rounds : [{ name: '', description: '', difficulty: 'Medium' }]
+    });
+    setShowForm(true);
+  };
+
   // dev/demo helper so the page isn't empty when testing or for new users
   const seedExperiences = async () => {
     setSeeding(true);
