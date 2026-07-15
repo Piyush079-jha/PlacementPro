@@ -179,9 +179,15 @@ export default function Experiences() {
     if (!form.company || !form.role) return toast.error('Company and role are required');
     setSubmitting(true);
     try {
-      await axios.post('/api/experiences', form);
-      toast.success('Experience shared! Thank you 🙏');
+      if (editingId) {
+        await axios.put(`/api/experiences/${editingId}`, form);
+        toast.success('Experience updated 🙏');
+      } else {
+        await axios.post('/api/experiences', form);
+        toast.success('Experience shared! Thank you 🙏');
+      }
       setShowForm(false);
+      setEditingId(null);
       fetchExperiences();
       // reset back to defaults so the form's clean next time someone opens it
       setForm({ company: '', role: '', type: 'On-Campus', year: new Date().getFullYear(), package: '', tips: '', verdict: 'Selected', isAnonymous: false, rounds: [{ name: '', description: '', difficulty: 'Medium' }] });
