@@ -222,8 +222,8 @@ export default function Experiences() {
       {showForm && (
         <div className="card border border-primary-500/20 animate-slide-up">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-display font-semibold text-white flex items-center gap-2"><Award className="w-4 h-4 text-primary-400" /> Share Your Experience</h2>
-            <button onClick={() => setShowForm(false)} className="text-gray-500 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
+            <h2 className="font-display font-semibold text-white flex items-center gap-2"><Award className="w-4 h-4 text-primary-400" /> {editingId ? 'Edit Your Experience' : 'Share Your Experience'}</h2>
+            <button onClick={() => { setShowForm(false); setEditingId(null); }} className="text-gray-500 hover:text-white transition-colors"><X className="w-4 h-4" /></button>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid sm:grid-cols-2 gap-4">
@@ -292,9 +292,9 @@ export default function Experiences() {
 
             <div className="flex gap-3">
               <button type="submit" disabled={submitting} className="btn-primary flex items-center gap-2 disabled:opacity-50">
-                {submitting ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Submitting...</> : 'Share Experience'}
+                {submitting ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Submitting...</> : editingId ? 'Update Experience' : 'Share Experience'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="btn-ghost">Cancel</button>
+              <button type="button" onClick={() => { setShowForm(false); setEditingId(null); }} className="btn-ghost">Cancel</button>
             </div>
           </form>
         </div>
