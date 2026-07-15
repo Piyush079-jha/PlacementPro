@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Users, ThumbsUp, Plus, X, ChevronDown, ChevronUp, Award } from 'lucide-react';
+import { Users, ThumbsUp, Plus, X, ChevronDown, ChevronUp, Award, Pencil, Trash2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 // color coding for verdict badges - green/red/yellow for selected/rejected/pending
 const verdictColors = {
