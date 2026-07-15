@@ -12,8 +12,9 @@ const verdictColors = {
 };
 
 // single card for one experience, owns its own expand/collapse state
-const ExperienceCard = ({ exp, onUpvote }) => {
-  const [expanded, setExpanded] = useState(false); // each card expands independently
+const ExperienceCard = ({ exp, onUpvote, onEdit, onDelete, currentUserId }) => {
+  const [expanded, setExpanded] = useState(false); 
+  const isOwner = currentUserId && exp.user === currentUserId;
   return (
     <div className="card hover:scale-[1.005] transition-all duration-200">
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -28,7 +29,19 @@ const ExperienceCard = ({ exp, onUpvote }) => {
           </div>
         </div>
         {/* default to green styling if verdict somehow doesn't match the map */}
-        <span className={`badge border ${verdictColors[exp.verdict] || verdictColors.Selected}`}>{exp.verdict}</span>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className={`badge border ${verdictColors[exp.verdict] || verdictColors.Selected}`}>{exp.verdict}</span>
+          {isOwner && (
+            <div className="flex items-center gap-1">
+              <button onClick={() => onEdit(exp)} className="text-gray-500 hover:text-primary-400 transition-colors p-1" title="Edit">
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={() => onDelete(exp._id)} className="text-gray-500 hover:text-red-400 transition-colors p-1" title="Delete">
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-3">
