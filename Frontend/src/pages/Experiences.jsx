@@ -307,7 +307,7 @@ export default function Experiences() {
         </div>
       ) : experiences.length > 0 ? (
         <div className="grid md:grid-cols-2 gap-4">
-          {experiences.map(exp => <ExperienceCard key={exp._id} exp={exp} onUpvote={handleUpvote} />)}
+          {experiences.map(exp => <ExperienceCard key={exp._id} exp={exp} onUpvote={handleUpvote} onEdit={handleEdit} onDelete={handleDelete} currentUserId={user?._id || user?.id} />)}
         </div>
       ) : (
         <div className="text-center py-16 text-gray-600">
