@@ -4,6 +4,9 @@ const auth = require('../middleware/auth');
 const { callClaude, parseJSON } = require('../config/ai');
 const Interview = require('../models/Interview');
 const User = require('../models/User');
+const CompanyQuestion = require('../models/CompanyQuestion');
+
+const SUPPORTED_COMPANIES = ['TCS', 'Infosys', 'Wipro', 'Capgemini', 'Cognizant', 'Amazon', 'Google', 'Microsoft', 'Deloitte'];
 
 // Generate interview questions
 router.post('/questions', auth, async (req, res) => {
@@ -444,6 +447,59 @@ Return JSON:
     if (!parsed?.starterCode) return res.status(500).json({ error: 'Failed to generate starter code' });
 
     res.json({ success: true, starterCode: parsed.starterCode });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// List companies available for company-specific prep
+router.get('/companies', auth, (req, res) => {
+  res.json({ companies: SUPPORTED_COMPANIES });
+});
+
+// Get company-specific questions for a section: blends curated real questions
+// with AI-generated questions styled after that company's known pattern.
+router.post('/company-questions', auth, async (req, res) => {
+  try {
+    const { company, section, count = 10, difficulty = 'Medium', language = 'javascript' } = req.body;
+    if (!company || !section) return res.status(400).json({ error: 'company and section are required' });
+    if (!SUPPORTED_COMPANIES.includes(company)) return res.status(400).json({ error: 'Unsupported company' });
+
+    // 1. Pull whatever curated, verified real questions exist for this company + section
+    const curated = await CompanyQuestion.find({ company, section, source: 'curated' }).limit(count).lean();
+
+    const remaining = Math.max(count - curated.length, 0);
+    let aiGenerated = [];
+
+    if (remaining > 0) {
+      const systemPrompt = `You are an expert on ${company}'s actual campus/off-campus recruitment process in India. Generate questions that closely match the real style, difficulty, and topic pattern ${company} is known to use in their ${section} round. Respond with valid JSON only.`;
+
+      let userMessage;
+      if (section === 'Coding') {
+        userMessage = `Generate ${remaining} ${difficulty} difficulty coding problems in the style ${company} actually asks in their OA coding round.
+Each problem must be solvable by reading input from stdin and printing output to stdout.
+Provide 3 test cases per problem: 2 visible (hidden: false), 1 hidden (hidden: true).
+Write "starterCode" as properly indented, multi-line ${language} code.
+Return JSON array:
+[{ "id": "c1", "title": "...", "description": "...", "constraints": "...", "starterCode": "...", "testCases": [{"input":"...","expectedOutput":"...","hidden":false}] }]`;
+      } else if (section === 'Technical' || section === 'HR') {
+        userMessage = `Generate ${remaining} ${difficulty} difficulty ${section} interview questions in the style ${company} actually asks their candidates.
+Return JSON array:
+[{ "id": "q1", "question": "question text", "type": "${section}", "hints": ["hint1"] }]`;
+      } else {
+        userMessage = `Generate ${remaining} ${difficulty} difficulty MCQ questions for the ${section} round, in the style ${company} actually asks in their OA.
+IMPORTANT: never use double or single quote marks inside "question", "options", or "explanation" text — this breaks JSON.
+Return JSON array:
+[{ "id": "q1", "question": "question text", "options": ["A","B","C","D"], "correctIndex": 0, "explanation": "brief explanation" }]`;
+      }
+
+      const result = await callClaude(systemPrompt, userMessage, section === 'Coding' ? 3000 : 2500);
+      aiGenerated = parseJSON(result) || [];
+      aiGenerated = aiGenerated.map(q => ({ ...q, source: 'ai' }));
+    }
+
+    const combined = [...curated, ...aiGenerated];
+    res.json({ success: true, questions: combined, company, section, curatedCount: curated.length, aiCount: aiGenerated.length });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
