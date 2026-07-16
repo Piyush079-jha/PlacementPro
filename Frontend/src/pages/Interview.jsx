@@ -691,6 +691,14 @@ export default function Interview() {
         <h2 className="font-display font-semibold text-white flex items-center gap-2">
           <Play className="w-4 h-4 text-primary-400" /> What to expect
         </h2>
+        <div>
+          <label className="label">Company (optional)</label>
+          <select className="input-field" value={oaCompany} onChange={e => setOaCompany(e.target.value)}>
+            <option value="">Generic OA (no specific company)</option>
+            {COMPANIES.map(c => <option key={c} value={c}>{c} — actual drive pattern</option>)}
+          </select>
+          {oaCompany && <p className="text-xs text-primary-400 mt-1">Questions will follow {oaCompany}'s real OA pattern, blending verified past questions with AI-styled ones.</p>}
+        </div>
         <div className="space-y-3">
           {OA_SECTIONS.map(s => (
             <div key={s} className="flex items-center justify-between px-4 py-3 rounded-xl border border-white/10 text-sm">
