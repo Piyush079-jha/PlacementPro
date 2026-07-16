@@ -66,6 +66,8 @@ export default function Interview() {
   const [oaLanguage, setOaLanguage] = useState(savedOA?.oaLanguage ?? 'javascript');
   const [oaStarterCodeCache, setOaStarterCodeCache] = useState(savedOA?.oaStarterCodeCache ?? {}); // { [problemIndex]: { [language]: code } }
   const [oaLangLoading, setOaLangLoading] = useState(false);
+  const [oaCompany, setOaCompany] = useState(''); // '' = generic OA, otherwise company name
+  const COMPANIES = ['TCS', 'Infosys', 'Wipro', 'Capgemini', 'Cognizant', 'Amazon', 'Google', 'Microsoft', 'Deloitte'];
   // const [oaVerbalIndex, setOaVerbalIndex] = useState(0);
   // const [oaVerbalEval, setOaVerbalEval] = useState({});
   // const [oaVerbalLoading, setOaVerbalLoading] = useState(false);
