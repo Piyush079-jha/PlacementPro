@@ -167,13 +167,22 @@ export default function Interview() {
     try {
       const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-      const aptRes = await axios.post('/api/interview/mcq-questions', { category: 'Aptitude', difficulty: 'Medium', count: 10 });
+      const usingCompany = !!oaCompany;
+      const aptRes = usingCompany
+        ? await axios.post('/api/interview/company-questions', { company: oaCompany, section: 'Aptitude', difficulty: 'Medium', count: 10 })
+        : await axios.post('/api/interview/mcq-questions', { category: 'Aptitude', difficulty: 'Medium', count: 10 });
       await delay(1500);
-      const reaRes = await axios.post('/api/interview/mcq-questions', { category: 'Reasoning', difficulty: 'Medium', count: 10 });
+      const reaRes = usingCompany
+        ? await axios.post('/api/interview/company-questions', { company: oaCompany, section: 'Reasoning', difficulty: 'Medium', count: 10 })
+        : await axios.post('/api/interview/mcq-questions', { category: 'Reasoning', difficulty: 'Medium', count: 10 });
       await delay(1500);
-      const verRes = await axios.post('/api/interview/mcq-questions', { category: 'Verbal', difficulty: 'Medium', count: 10 });
+      const verRes = usingCompany
+        ? await axios.post('/api/interview/company-questions', { company: oaCompany, section: 'Verbal', difficulty: 'Medium', count: 10 })
+        : await axios.post('/api/interview/mcq-questions', { category: 'Verbal', difficulty: 'Medium', count: 10 });
       await delay(1500);
-      const codeRes = await axios.post('/api/interview/coding-questions', { difficulty: 'Medium', count: 2, language: oaLanguage });
+      const codeRes = usingCompany
+        ? await axios.post('/api/interview/company-questions', { company: oaCompany, section: 'Coding', difficulty: 'Medium', count: 2, language: oaLanguage })
+        : await axios.post('/api/interview/coding-questions', { difficulty: 'Medium', count: 2, language: oaLanguage });
       setOaData({
         Aptitude: aptRes.data.questions,
         Reasoning: reaRes.data.questions,
