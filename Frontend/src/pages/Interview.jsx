@@ -867,8 +867,8 @@ export default function Interview() {
                     <button onClick={runOACode} disabled={oaRunning} className="btn-primary flex items-center gap-2 disabled:opacity-50">
                       {oaRunning ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Running...</> : <><Play className="w-4 h-4" /> Run Code</>}
                     </button>
-                    <button onClick={() => oaCodingIndex < oaData.Coding.length - 1 ? setOaCodingIndex(i => i + 1) : advanceOASection()} className="btn-ghost text-sm">
-                      {oaCodingIndex < oaData.Coding.length - 1 ? 'Next Problem →' : 'Finish Assessment →'}
+                    <button onClick={() => oaCodingIndex < codingList.length - 1 ? setOaCodingIndex(i => i + 1) : advanceOASection()} className="btn-ghost text-sm">
+                      {oaCodingIndex < codingList.length - 1 ? 'Next Problem →' : 'Finish Assessment →'}
                     </button>
                   </div>
                 </div>
