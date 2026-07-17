@@ -101,6 +101,39 @@ async function callClaudeSafe(systemPrompt, userMessage, maxTokens = 1500, tier 
 
 const { jsonrepair } = require('jsonrepair');
 
+// Last-resort repair for a known failure mode: the model writes markdown-style
+// "docs" instead of JSON — plain "Starter Code:" / "Test Cases:" headers, nested
+// ``` fences, and unescaped literal newlines instead of a real JSON string field.
+function repairMarkdownCodingResponse(text) {
+  const blocks = text.split(/"id"\s*:\s*"/).slice(1);
+  if (!blocks.length) return null;
+
+  const problems = [];
+  for (const raw of blocks) {
+    const idMatch = raw.match(/^([^"]+)"/);
+    const titleMatch = raw.match(/"title"\s*:\s*"([^"]*)"/);
+    const descMatch = raw.match(/"description"\s*:\s*"([\s\S]*?)\n\s*Starter Code:/i);
+    const codeMatch = raw.match(/Starter Code:\s*```[a-zA-Z]*\n([\s\S]*?)```/i);
+    const testMatch = raw.match(/Test Cases:\s*```json\n([\s\S]*?)```/i);
+    if (!idMatch || !titleMatch || !descMatch || !codeMatch || !testMatch) continue;
+
+    let testCases;
+    try { testCases = JSON.parse(jsonrepair(testMatch[1])); } catch { continue; }
+
+    const constraintsMatch = descMatch[1].match(/Constraints:\s*([\s\S]*)$/i);
+
+    problems.push({
+      id: idMatch[1].trim(),
+      title: titleMatch[1].trim(),
+      description: descMatch[1].trim(),
+      constraints: constraintsMatch ? constraintsMatch[1].trim() : '',
+      starterCode: codeMatch[1].trim(),
+      testCases
+    });
+  }
+  return problems.length ? problems : null;
+}
+
 function parseJSON(text) {
   try {
     // Try direct parse first
@@ -124,6 +157,12 @@ function parseJSON(text) {
     const match = cleaned.match(/[\{\[][\s\S]*[\}\]]/);
     if (match) return JSON.parse(jsonrepair(match[0]));
   } catch {}
+
+  // Last resort: model wrote markdown-style docs instead of JSON — salvage it.
+  if (/Starter Code:/i.test(text) && /Test Cases:/i.test(text)) {
+    const repaired = repairMarkdownCodingResponse(text);
+    if (repaired) return repaired;
+  }
 
   return null;
 }
