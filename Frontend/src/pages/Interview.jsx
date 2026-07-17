@@ -796,13 +796,21 @@ export default function Interview() {
         )}
 
         {section === 'Coding' && (() => {
-          const problem = oaData.Coding[oaCodingIndex];
+          const codingList = oaData.Coding || [];
+          const problem = codingList[oaCodingIndex];
           const runResult = oaRunResults[oaCodingIndex];
-          if (!problem) return null;
+          if (!problem) {
+            return (
+              <div className="card border border-red-500/20 space-y-2">
+                <p className="text-red-400 text-sm font-medium">Coding problems failed to load.</p>
+                <p className="text-gray-500 text-xs">Please use Exit above and try starting the assessment again.</p>
+              </div>
+            );
+          }
           return (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-gray-400">Problem {oaCodingIndex + 1}/{oaData.Coding.length}</p>
+                <p className="text-sm text-gray-400">Problem {oaCodingIndex + 1}/{codingList.length}</p>
               </div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
                 <div className="space-y-4">
