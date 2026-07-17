@@ -369,10 +369,28 @@ router.post('/coding-questions', auth, async (req, res) => {
 Generate realistic coding problems with clear input/output format, similar to real OA coding rounds.
 
 CRITICAL OUTPUT RULES:
-- Respond with ONE valid JSON array and NOTHING else — no markdown, no code fences, no \`\`\`json blocks, no explanatory text before or after.
-- Every field must be a single JSON string value. NEVER put literal line breaks inside a string — use \\n escape sequences instead.
-- NEVER nest markdown code fences (\`\`\`) inside any field, including "description" and "starterCode". "starterCode" must be a plain string with \\n escapes, not a fenced code block.
-- The entire response must be parseable directly by JSON.parse with no post-processing.`;
+- Respond with ONE valid JSON array and NOTHING else — no markdown, no code fences, no \`\`\`json or \`\`\`javascript blocks anywhere, no explanatory text before or after, no section headers like "Starter Code:" or "Test Cases:" written as plain text.
+- Every field must be a single, fully-quoted JSON string value on the correct key. NEVER put literal line breaks inside a string — use \\n escape sequences instead.
+- NEVER nest markdown code fences inside any field, including "description" and "starterCode". "starterCode" must be a plain quoted string with \\n escapes, not a fenced code block.
+- Every field must open AND close with a quote on its own — never let "description" run on into a "Starter Code:" or "Test Cases:" section.
+- The entire response must be parseable directly by JSON.parse with no post-processing.
+
+Example of the EXACT format required (structure only):
+[{"id":"c1","title":"Two Sum","description":"Given an array...\\n\\nInput Format:\\n- line 1: n\\n\\nConstraints:\\n1 <= n <= 100","constraints":"1 <= n <= 100","starterCode":"const rl = require('readline').createInterface({...});\\nrl.on('line', line => {\\n  // write your code here\\n});","testCases":[{"input":"3\\n1 2 3","expectedOutput":"3","hidden":false}]}]
+
+Do NOT produce this (WRONG):
+[{"id":"c1","title":"Two Sum","description":"Given an array...
+
+Starter Code:
+\`\`\`javascript
+// code here
+\`\`\`
+
+Test Cases:
+\`\`\`json
+[{"input":"3\\n1 2 3"}]
+\`\`\`
+}]`;
 
     const topics = ['arrays', 'strings', 'basic loops and conditionals', 'sorting', 'searching', 'recursion basics', 'hashmaps', 'two pointers'];
     const randomTopic = topics[Math.floor(Math.random() * topics.length)];
