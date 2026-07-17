@@ -766,9 +766,10 @@ export default function Interview() {
 
         {section === 'Verbal' && (
           <div className="space-y-4">
-            {oaData.Verbal.map((q, i) => {
-              const hasPassage = q.question.includes('|||');
-              const [passage, actualQuestion] = hasPassage ? q.question.split('|||') : [null, q.question];
+            {(oaData.Verbal || []).map((q, i) => {
+              const questionText = q?.question || '';
+              const hasPassage = questionText.includes('|||');
+              const [passage, actualQuestion] = hasPassage ? questionText.split('|||') : [null, questionText];
               return (
                 <div key={i} className="card space-y-3">
                   {passage && (
