@@ -779,7 +779,7 @@ export default function Interview() {
                   )}
                   <p className="text-white font-medium text-sm whitespace-pre-line">{i + 1}. {actualQuestion.trim()}</p>
                   <div className="space-y-2">
-                    {q.options.map((opt, oi) => (
+                    {(q?.options || []).map((opt, oi) => (
                       <button key={oi} onClick={() => selectOAMcqAnswer('Verbal', i, oi)}
                         className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${oaAnswers.Verbal[i] === oi ? 'border-primary-500/50 bg-primary-500/10 text-primary-300' : 'border-white/10 text-gray-300 hover:border-primary-500/30'}`}>
                         {opt}
