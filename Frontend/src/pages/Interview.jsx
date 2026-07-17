@@ -745,11 +745,11 @@ export default function Interview() {
 
         {(section === 'Aptitude' || section === 'Reasoning') && (
           <div className="space-y-4">
-            {oaData[section].map((q, i) => (
+            {(oaData[section] || []).map((q, i) => (
               <div key={i} className="card space-y-3">
-                <p className="text-white font-medium text-sm">{i + 1}. {q.question}</p>
+                <p className="text-white font-medium text-sm">{i + 1}. {q?.question}</p>
                 <div className="space-y-2">
-                  {q.options.map((opt, oi) => (
+                  {(q?.options || []).map((opt, oi) => (
                     <button key={oi} onClick={() => selectOAMcqAnswer(section, i, oi)}
                       className={`w-full text-left px-4 py-2.5 rounded-lg border text-sm transition-all ${oaAnswers[section][i] === oi ? 'border-primary-500/50 bg-primary-500/10 text-primary-300' : 'border-white/10 text-gray-300 hover:border-primary-500/30'}`}>
                       {opt}
