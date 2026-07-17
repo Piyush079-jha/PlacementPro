@@ -822,7 +822,7 @@ export default function Interview() {
                   {runResult && (
                     <div className="space-y-2">
                       <p className="text-sm text-gray-400">{runResult.passedCount}/{runResult.totalCount} test cases passed</p>
-                      {runResult.results.filter(r => !r.hidden).map((r, ri) => (
+                      {(runResult.results || []).filter(r => !r.hidden).map((r, ri) => (
                         <div key={ri} className={`card text-xs space-y-1 border ${r.passed ? 'border-green-500/20' : 'border-red-500/20'}`}>
                           <p className="text-gray-400">Input: <span className="text-gray-300">{r.input}</span></p>
                           <p className="text-gray-400">Expected: <span className="text-gray-300">{r.expectedOutput}</span></p>
