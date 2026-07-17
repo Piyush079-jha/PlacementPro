@@ -722,10 +722,18 @@ export default function Interview() {
   if (stage === STAGES.OA_ACTIVE) {
     const section = OA_SECTIONS[oaSectionIndex];
 
+    const exitAssessment = () => {
+      const proceed = window.confirm('Leave the assessment? Your progress will be lost.');
+      if (!proceed) return;
+      clearOAProgress();
+      setStage(STAGES.MODE);
+    };
+
     return (
       <div className="space-y-5 animate-fade-in">
         <div className="flex items-center justify-between">
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <button onClick={exitAssessment} className="btn-ghost text-xs text-gray-500 hover:text-red-400 mr-2">← Exit</button>
             {OA_SECTIONS.map((s, i) => (
               <span key={s} className={`badge text-xs ${i === oaSectionIndex ? 'bg-primary-500/20 text-primary-300 border border-primary-500/30' : i < oaSectionIndex ? 'bg-green-500/10 text-green-400' : 'bg-white/5 text-gray-600'}`}>{s}</span>
             ))}
