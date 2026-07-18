@@ -18,6 +18,13 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [focusMode, setFocusMode] = useState(false);
+
+  useState(() => {
+    const handler = (e) => setFocusMode(!!e.detail);
+    window.addEventListener('app:focus-mode', handler);
+    return () => window.removeEventListener('app:focus-mode', handler);
+  }, []);
 
   const handleLogout = () => {
     logout();
