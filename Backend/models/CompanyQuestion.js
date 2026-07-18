@@ -8,8 +8,10 @@ const companyQuestionSchema = new mongoose.Schema({
   correctIndex: Number, // present for MCQ sections
   explanation: String,
   // for Coding-type entries
+  title: String,
   description: String,
   constraints: String,
+  starterCode: String,
   testCases: [{ input: String, expectedOutput: String, hidden: Boolean }],
   source: { type: String, default: 'curated' }, // 'curated' = verified real question, 'ai' = AI-generated in company style
   verified: { type: Boolean, default: true },
