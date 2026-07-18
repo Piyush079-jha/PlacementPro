@@ -1,0 +1,114 @@
+Here are two medium difficulty coding problems in the style of Infosys' OA coding round:
+
+```json
+[
+  {
+    "id": "c1",
+    "title": "Number of Beautiful Partitions",
+    "description": "Given a positive integer N, find the number of partitions of N into distinct even parts.",
+    "constraints": "1 <= N <= 10^6",
+    "starterCode": `
+function solve(N) {
+  let memo = new Array(N + 1).fill(0);
+  memo[0] = 1;
+  for (let i = 2; i <= N; i++) {
+    if (i % 2 === 0) {
+      for (let j = Math.floor(i / 2); j > 0; j--) {
+        memo[i] += memo[i - j];
+      }
+    }
+  }
+  return memo[N];
+}
+
+function main() {
+  const readline = require('readline');
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question('', (N) => {
+    console.log(solve(parseInt(N)));
+    rl.close();
+  });
+}
+`,
+
+    "testCases": [
+      {
+        "input": "10",
+        "expectedOutput": "6",
+        "hidden": false
+      },
+      {
+        "input": "20",
+        "expectedOutput": "34",
+        "hidden": false
+      },
+      {
+        "input": "100",
+        "expectedOutput": "1214",
+        "hidden": true
+      }
+    ]
+  },
+  {
+    "id": "c2",
+    "title": "Longest Zigzag Subsequence",
+    "description": "Given a sequences of integers, find the length of the longest zigzag subsequence.",
+    "constraints": "1 <= length of A <= 10^5",
+    "starterCode": `
+function solve(A) {
+  let n = A.length;
+  let up = new Array(n).fill(0);
+  let down = new Array(n).fill(0);
+  up[0] = 1;
+  for (let i = 1; i < n; i++) {
+    for (let j = 0; j < i; j++) {
+      if (A[i] > A[j]) {
+        up[i] = Math.max(up[i], up[j] + 1);
+      } else if (A[i] < A[j]) {
+        down[i] = Math.max(down[i], down[j] + 1);
+      }
+    }
+    up[i] = Math.max(up[i], down[i] + 1);
+    down[i] = Math.max(down[i], up[i] + 1);
+  }
+  return Math.max(...up) + Math.max(...down) - 1;
+}
+
+function main() {
+  const readline = require('readline');
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question('', (A) => {
+    console.log(solve(A.split(' ').map(Number)));
+    rl.close();
+  });
+}
+`,
+
+    "testCases": [
+      {
+        "input": "5 2 1 3 2",
+        "expectedOutput": "4",
+        "hidden": false
+      },
+      {
+        "input": "10 1 2 3 4 5 6 7 8 9",
+        "expectedOutput": "8",
+        "hidden": false
+      },
+      {
+        "input": "100 1 2 3 4 5 6 7 8 9 10 15 20 25",
+        "expectedOutput": "29",
+        "hidden": true
+      }
+    ]
+  }
+]
+```

@@ -494,10 +494,17 @@ router.post('/company-questions', auth, async (req, res) => {
 
       let userMessage;
       if (section === 'Coding') {
+        systemPrompt += `
+
+CRITICAL OUTPUT RULES:
+- Respond with ONE valid JSON array and NOTHING else — no markdown, no code fences, no explanatory text before or after.
+- NEVER use JavaScript template literal backticks (\` \`) for any field, including "starterCode". Every field must be a plain, fully-quoted JSON string.
+- NEVER put literal line breaks inside a string — use \\n escape sequences instead.
+- The entire response must be parseable directly by JSON.parse with no post-processing.`;
         userMessage = `Generate ${remaining} ${difficulty} difficulty coding problems in the style ${company} actually asks in their OA coding round.
 Each problem must be solvable by reading input from stdin and printing output to stdout.
 Provide 3 test cases per problem: 2 visible (hidden: false), 1 hidden (hidden: true).
-Write "starterCode" as properly indented, multi-line ${language} code.
+Write "starterCode" as a plain quoted JSON string containing properly indented, multi-line ${language} code with \\n line breaks — never a template literal, never backticks.
 Return JSON array:
 [{ "id": "c1", "title": "...", "description": "...", "constraints": "...", "starterCode": "...", "testCases": [{"input":"...","expectedOutput":"...","hidden":false}] }]`;
       } else if (section === 'Technical' || section === 'HR') {
