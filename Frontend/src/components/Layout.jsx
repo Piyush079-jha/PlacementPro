@@ -132,6 +132,7 @@ export default function Layout({ children }) {
             {user?.name?.[0]?.toUpperCase() || 'U'}
           </div>
         </header>
+        )}
 
         {/* Page content */}
         <main className="flex-1 overflow-y-auto">
