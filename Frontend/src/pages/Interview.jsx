@@ -185,6 +185,8 @@ export default function Interview() {
       const codeRes = usingCompany
         ? await axios.post('/api/interview/company-questions', { company: oaCompany, section: 'Coding', difficulty: 'Medium', count: 2, language: oaLanguage })
         : await axios.post('/api/interview/coding-questions', { difficulty: 'Medium', count: 2, language: oaLanguage });
+      console.log('DEBUG codeRes.data:', codeRes.data);
+      console.log('DEBUG codeRes.data.questions:', JSON.stringify(codeRes.data.questions, null, 2));
       setOaData({
         Aptitude: aptRes.data.questions,
         Reasoning: reaRes.data.questions,
