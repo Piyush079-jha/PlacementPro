@@ -119,6 +119,7 @@ export default function Layout({ children }) {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Mobile header */}
+        {!focusMode && (
         <header className="lg:hidden flex items-center justify-between px-4 py-3 border-b border-white/5 bg-dark-800/50">
           <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-white/5 transition-colors">
             <Menu className="w-5 h-5 text-gray-400" />
