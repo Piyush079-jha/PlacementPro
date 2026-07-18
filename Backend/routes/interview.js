@@ -512,7 +512,14 @@ Return JSON array:
       }
 
       const result = await callClaude(systemPrompt, userMessage, section === 'Coding' ? 3000 : 2500);
-      aiGenerated = parseJSON(result) || [];
+      aiGenerated = parseJSON(result);
+      if (!aiGenerated) {
+        const fs = require('fs');
+        const debugPath = require('path').join(__dirname, '..', 'debug-company-fail.txt');
+        fs.writeFileSync(debugPath, result || '(empty response)');
+        console.error(`company-questions: failed to parse AI response for ${company}/${section}. Full response written to ${debugPath}`);
+        aiGenerated = [];
+      }
       aiGenerated = aiGenerated.map(q => ({ ...q, source: 'ai' }));
     }
 
