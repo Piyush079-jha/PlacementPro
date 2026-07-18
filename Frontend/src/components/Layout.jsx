@@ -97,12 +97,14 @@ export default function Layout({ children }) {
   return (
     <div className="flex h-screen overflow-hidden bg-dark-900">
       {/* Desktop sidebar */}
+      {!focusMode && (
       <aside className="hidden lg:flex w-64 flex-col flex-shrink-0 border-r border-white/5 bg-dark-800/50">
         <SidebarContent />
       </aside>
+      )}
 
       {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
+      {!focusMode && sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
           <aside className="relative z-10 w-64 flex flex-col bg-dark-800 border-r border-white/5">
