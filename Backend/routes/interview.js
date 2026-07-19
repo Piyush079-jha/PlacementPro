@@ -512,8 +512,14 @@ Return JSON array:
 Return JSON array:
 [{ "id": "q1", "question": "question text", "type": "${section}", "hints": ["hint1"] }]`;
       } else {
+        systemPrompt += `
+
+CRITICAL OUTPUT RULES:
+- Respond with ONE valid JSON array and NOTHING else — no markdown, no code fences, no explanatory text before or after.
+- EVERY value must be a properly double-quoted JSON string, including "question" and "explanation" — never write a bare, unquoted value.
+- The entire response must be parseable directly by JSON.parse with no post-processing.`;
         userMessage = `Generate ${remaining} ${difficulty} difficulty MCQ questions for the ${section} round, in the style ${company} actually asks in their OA.
-IMPORTANT: never use double or single quote marks inside "question", "options", or "explanation" text — this breaks JSON.
+IMPORTANT: never use double or single quote marks inside "question", "options", or "explanation" text — this breaks JSON. Also, every "question" and "explanation" value MUST be wrapped in double quotes like a normal JSON string — never leave them bare/unquoted.
 Return JSON array:
 [{ "id": "q1", "question": "question text", "options": ["A","B","C","D"], "correctIndex": 0, "explanation": "brief explanation" }]`;
       }
