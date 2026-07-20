@@ -524,7 +524,16 @@ Return JSON array:
 [{ "id": "q1", "question": "question text", "options": ["A","B","C","D"], "correctIndex": 0, "explanation": "brief explanation" }]`;
       }
 
-      const result = await callClaude(systemPrompt, userMessage, section === 'Coding' ? 3000 : 2500);
+      let rawResult = await callClaude(systemPrompt, userMessage, section === 'Coding' ? 3000 : 2500);
+      if (section === 'Coding' && rawResult && rawResult.includes('`')) {
+        // Repair template-literal backticks the model may have used despite instructions:
+        // convert backtick-delimited blocks into a properly JSON-escaped string.
+        rawResult = rawResult.replace(/`([\s\S]*?)`/g, (match, inner) => {
+          const escaped = inner.replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\n/g, '\\n').replace(/\r/g, '');
+          return `"${escaped}"`;
+        });
+      }
+      const result = rawResult;
       aiGenerated = parseJSON(result);
       if (!aiGenerated) {
         const fs = require('fs');
